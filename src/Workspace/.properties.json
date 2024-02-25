@@ -1,0 +1,16 @@
+{
+	"GlobalWind": [0, 0, 0],
+	"WorldPivot": [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+	"Gravity": 196.1999969482422,
+	"Class": "Workspace",
+	"Retargeting": "Enum.AnimatorRetargetingMode.Default",
+	"FallenPartsDestroyHeight": -500,
+	"CurrentCamera": "Workspace\\Camera",
+	"ClientAnimatorThrottling": "Enum.ClientAnimatorThrottlingMode.Default",
+	"InterpolationThrottling": "Enum.InterpolationThrottlingMode.Default",
+	"StreamingEnabled": true,
+	"LevelOfDetail": "Enum.ModelLevelOfDetail.Automatic",
+	"AirDensity": 0.0012000000569969416,
+	"DistributedGameTime": 0,
+	"ModelStreamingMode": "Enum.ModelStreamingMode.Default"
+}

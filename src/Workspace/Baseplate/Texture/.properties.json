@@ -1,0 +1,12 @@
+{
+	"OffsetStudsU": 0,
+	"OffsetStudsV": 0,
+	"Class": "Texture",
+	"StudsPerTileU": 8,
+	"Transparency": 0.800000011920929,
+	"StudsPerTileV": 8,
+	"Face": "Enum.NormalId.Top",
+	"ZIndex": 1,
+	"Color3": [0, 0, 0],
+	"Texture": "rbxassetid://6372755229"
+}
