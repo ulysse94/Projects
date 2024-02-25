@@ -2,7 +2,7 @@
 
 Vous trouverez ici mes projets les plus récents en Python et Lua. J'ai aussi fait (dans le cadre d'un éxercice guidé en mathématique) une fonction pour résoudre le problème des tours de Hanoï, qui une réécriture. 
 
-Mon code en Lua s'inscrit dans le moteur de [Roblox](https://create.roblox.com/docs/fr-fr/platform), un moteur 3D optimisé pour le jeux-vidéo massivement-multijoueur. La plupart des annotations sont en anglais, mais certaines d'entre-elles sont en français. Je n'ai pas utilisé d'IA (ChatGPT, Roblox CodeAssist) pour écrire ces scripts, mais j'ai utilisé ces IA pour comprendre et mieux modéliser certains phénomènes physique.
+Mon code en Lua s'inscrit dans le moteur de [Roblox](https://create.roblox.com/docs/fr-fr/platform), un moteur 3D optimisé pour le jeux-vidéo et sa plateforme massivement-multijoueur. La plupart des annotations sont en anglais, mais certaines d'entre-elles sont en français. Je n'ai pas utilisé d'IA (ChatGPT, Roblox CodeAssist) pour écrire ces scripts, mais j'ai utilisé ces IA pour comprendre et mieux modéliser certains phénomènes physique.
 
 ## Python
 
