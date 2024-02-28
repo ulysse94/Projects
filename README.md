@@ -4,7 +4,7 @@ Vous trouverez ici mes projets les plus récents en Python et Lua. J'ai aussi fa
 
 Mon code en Lua s'inscrit dans le moteur de [Roblox](https://create.roblox.com/docs/fr-fr/platform), un moteur 3D optimisé pour le jeux-vidéo et sa plateforme massivement-multijoueur. La plupart des annotations sont en __anglais__, mais certaines d'entre-elles sont en français. 
 
-Je n'ai pas utilisé d'IA (ChatGPT, Roblox CodeAssist) pour écrire ces scripts, mais j'ai utilisé ces IA pour comprendre et mieux modéliser certains phénomènes physique. Ces IA ne donnaient d'ailleurs que des réponses très vague, ou utilisait des bouts d'API dépréciées.
+Je n'ai pas utilisé d'IA (ChatGPT, Roblox CodeAssist) pour écrire ces scripts, mais j'ai utilisé ces IA pour comprendre et mieux modéliser certains phénomènes physique. Ces IA ne donnaient d'ailleurs que des réponses très vagues, et dans le cas de la programmation, utilisaient des bouts d'API soit dépréciées ou ne comprenaient pas la requête.
 
 J'ai utilisé VSCode, RobloxStudio, Argon (extension de VSCode/Roblox Studio pour la synchronisation), et parfois quelque plug-ins de Roblox Studio pour faciliter la construction et la création d'effets pour l'interface graphique.
 
@@ -19,7 +19,7 @@ Retourne une liste de toutes les parties d'un ensemble. Par quelques modificatio
 *../Python/ToursHanoi.py*
 
 Ecrit après un éxercice guidé de Première spécialité maths, dans lequel on cherchait le temps nécessaire au déplacement de tous les disques.
-Je pense que le code n'est, même s'il utilise de la récursivité, entièrement optimisé. J'ai aussi tenté d'afficher visuelement dans la console les tours.
+Je pense que le code n'est, même s'il utilise de la récursivité, pas entièrement optimisé. J'ai aussi tenté d'afficher visuelement dans la console les tours.
 
 ## Roblox
 
