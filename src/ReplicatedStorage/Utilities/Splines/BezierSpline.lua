@@ -184,7 +184,7 @@ function bezierSpline:CalculateLength():number
 	if #self.Points == 2 then
 		-- right.
 		table.clear(self.Model)
-		self.Length = (getVector(self.Points[i+1])-getVector(self.Points[i])).Magnitude
+		self.Length = (getVector(self.Points[#self.Points])-getVector(1)).Magnitude
 		self.Model[1] = {1,self.Length}
 		return self.Length
 	elseif self.Points >= 3 then
