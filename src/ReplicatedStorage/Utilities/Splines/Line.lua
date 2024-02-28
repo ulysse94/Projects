@@ -7,7 +7,7 @@ local matrix = require(game.ReplicatedStorage.Utilities.Matrix)
 --[[
 	Creates a new Line object
 ]]
-function line.new(controlPoints: {Vector2} | {Vector3 | BasePart}?)
+function line.new(controlPoints: {Vector2} | {Vector3 | BasePart}?, resolution:number?)
 	local self = {}
 	
 	self.Type = "Line"
@@ -93,7 +93,7 @@ function line:UpdatePoints(newControlPoints:{Vector2} | {Vector3 | BasePart}?):{
 	for i = 1,#self.Points-1,1 do
 		local length = self:CalculateLengthBetweenControlPoint(i)
 		local partRatio = length / totalLength
-		ret[t] = {i, getVector(self.Points[i+1]) - getVector(self.Points[i])} -- length, directional vector.
+		ret[t] = {i, getVector(self.Points[i+1]) - getVector(self.Points[i])} -- point number, directional vector.
 		t+=partRatio
 		totalLength += length
 	end

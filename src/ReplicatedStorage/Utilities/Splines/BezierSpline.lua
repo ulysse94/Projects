@@ -7,18 +7,21 @@ local matrix = require(game.ReplicatedStorage.Utilities.Matrix)
 --[[
 	Creates a new Spline object
 ]]
-function bezierSpline.new(controlPoints: {Vector2} | {Vector3 | BasePart}?)
+function bezierSpline.new(controlPoints: {Vector2} | {Vector3 | BasePart}?, resolution:number?)
 	local self = {}
 	
 	self.Type = "Bezier"
 	self.Points = nil
-	self.Connections = {} -- Set by the server.
-	--[[ Will return a table this way:
+	-- the resolution helps calculating the length. divides the curve into <resolution> segments.
+	self.Resolution = resolution or 100
+	--[[ Set by the server. Will return a table this way:
 	{
 		[1] = BackConnectionPoint,
 		[2] = FrontConnectionPoint
 	}
 	]]
+	self.Connections = {}
+	self.Model = {} -- lazy arclength parameterization
 	self.Length = 0
 	
 	setmetatable(self, {
@@ -104,40 +107,32 @@ end
 	LookVector of the CFrame at t.
 ]]
 function bezierSpline:CalculateDerivateAt(t:number):Vector3|Vector2
-	
-	
+
 	-- guess what? we are calculating the derivate of that bezier spline at t.
 	-- i took days to find how to derivate a bezier curve.
-	
-	local res
+
 	local n = #self.Points - 1
 
 	-- Function to calculate the derivative of the Bernstein basis polynomial
 	local posSum = nil
-	
+
 	for i=0,n do
-		-- Function to calculate binomial coefficient
-		if i == 0 or i == n then
-			res = 1
-		elseif i > n then
-			res = 0
-		end
 
 		local res = 1
 		for i = 1, math.min(i, n - i) do
 			res = res * (n - i + 1) / i
 		end
-		
+
 		local term1 = res * (-1) * (n - i) * ((1 - t) ^ (n - i - 1)) * (t ^ i)
 		local term2 = res * i * ((1 - t) ^ (n - i)) * (t ^ (i - 1))
-		
+
 		if not posSum then
 			posSum = (term1+term2)*getVector(self.Points[i+1])
 		else 
 			posSum += (term1+term2)*getVector(self.Points[i+1])
 		end
 	end
-	
+
 	-- now you pray for it to work 〒▽〒
 	return posSum
 end
@@ -184,12 +179,34 @@ function bezierSpline:CalculateCFrameAt(t:number):CFrame
 	return resultCFrame
 end
 
--- Not the most efficient way to calculate the length of a Bezier spline
+
 function bezierSpline:CalculateLength():number
 	if #self.Points == 2 then
+		-- right.
+		table.clear(self.Model)
 		return (getVector(self.Points[i+1])-getVector(self.Points[i])).Magnitude
-	elseif self.Points == 3 then
-		
+	elseif self.Points >= 3 then
+		-- plan is: divide it into multiple little segments and approximate the length.
+		-- not the most efficient way to calculate the length of a Bezier spline
+		-- best would be to represent the curve mathematically and then calculate the length.
+		-- looked into it on stackexchange for better results, didnt find much... except this, which recommended the same thing:
+		-- https://gamedev.stackexchange.com/questions/5373/moving-ships-between-two-planets-along-a-bezier-missing-some-equations-for-acce/5427#5427
+
+		-- we set self.Model and self.Length, the same way Line class does it.
+		local N = self.Resolution or 100
+		table.clear(self.Model)
+		local totalLength = 0
+		for i = 1, N do
+			local point = self:CalculatePositionAt(i/N)
+			local previousPoint = if self.Model[i-1] then self:CalculatePositionAt(self.Model[i-1][1]) else getVector(self.Points[1])
+			totalLength += (point - previousPoint).Magnitude
+			self.Model[i/N] = {totalLength, } -- we wont put the point number first, but the length, then the vector
+			
+		end
+
+		self.Length = totalLength
+
+		return totalLength
 	end
 	
 	return 0
