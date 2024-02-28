@@ -138,7 +138,8 @@ function generateCurves():nil
 		if section:IsA("Model") then
 			local sortedPoints = sortPoints(section)
 			if #sortPoints(section) >= 2 then
-				local spline = Splines[section:GetAttribute("SplineType") or "BezierSpline"].new(sortedPoints)
+				local resolution = section:GetAttribute("SectionResolution") or nil
+				local spline = Splines[section:GetAttribute("SplineType") or "BezierSpline"].new(sortedPoints, resolution)
 
 				for i = step, 1, step do
 					local part = Instance.new("Part")
@@ -161,6 +162,7 @@ function generateCurves():nil
 			end
 		elseif section:IsA("Part") then
 			-- The section turns out to be a node... not a part!
+			-- TODO: node.
 		end
 	end
 	

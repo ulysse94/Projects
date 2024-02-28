@@ -41,12 +41,14 @@ function bezierSpline:UpdatePoints(controlPoints: {Vector2} | {Vector3 | BasePar
 	self.Points = controlPoints
 	
 	if controlPoints then
-		local length = 0
-		local n = 100 -- precise enough
-		for k = 0,n-1,1 do 
-			length += (self:CalculatePositionAt(k/n)+self:CalculatePositionAt(k+1/n)).Magnitude
-		end
-		self.Length = length
+		-- local length = 0
+		-- local n = 100 -- precise enough
+		-- for k = 0,n-1,1 do 
+		-- 	length += (self:CalculatePositionAt(k/n)+self:CalculatePositionAt(k+1/n)).Magnitude
+		-- end
+		-- self.Length = length
+
+		self:CalculateLength()
 	end
 end
 
@@ -88,8 +90,8 @@ function bezierSpline:CalculatePositionAt(t:number):Vector3|Vector2
 	for i=0,n do
 		-- https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Explicit_definition
 		-- it's... an interpretation. tho idk how to calculate binomial coefficient. had to ask an AI... then made the factorial thing.
-		local binomialCoefficient = nCk(n,i) -- I DONT KNOW WHAT THIS IS AAAAA
-		local term = binomialCoefficient * (1 - t)^(n - i) * t^i * getVector(self.Points[i + 1]) --i+1 cuz i=0 doesnt exit.
+		local binomialCoefficient = nCk(n,i)
+		local term = binomialCoefficient * (1 - t)^(n - i) * t^i * getVector(self.Points[i + 1]) --i+1 cuz i=0 doesnt exist.
 		-- bernstein coefficient: B_{n,i} = (n;i) * (1-t)^(n-i) * t^i
 		
 		if not posSum then
@@ -109,15 +111,14 @@ end
 function bezierSpline:CalculateDerivateAt(t:number):Vector3|Vector2
 
 	-- guess what? we are calculating the derivate of that bezier spline at t.
-	-- i took days to find how to derivate a bezier curve.
 
 	local n = #self.Points - 1
 
-	-- Function to calculate the derivative of the Bernstein basis polynomial
 	local posSum = nil
 
 	for i=0,n do
 
+		-- it was very hard to find the correct formula...
 		local res = 1
 		for i = 1, math.min(i, n - i) do
 			res = res * (n - i + 1) / i
@@ -179,12 +180,13 @@ function bezierSpline:CalculateCFrameAt(t:number):CFrame
 	return resultCFrame
 end
 
-
 function bezierSpline:CalculateLength():number
 	if #self.Points == 2 then
 		-- right.
 		table.clear(self.Model)
-		return (getVector(self.Points[i+1])-getVector(self.Points[i])).Magnitude
+		self.Length = (getVector(self.Points[i+1])-getVector(self.Points[i])).Magnitude
+		self.Model[1] = {1,self.Length}
+		return self.Length
 	elseif self.Points >= 3 then
 		-- plan is: divide it into multiple little segments and approximate the length.
 		-- not the most efficient way to calculate the length of a Bezier spline
@@ -200,8 +202,7 @@ function bezierSpline:CalculateLength():number
 			local point = self:CalculatePositionAt(i/N)
 			local previousPoint = if self.Model[i-1] then self:CalculatePositionAt(self.Model[i-1][1]) else getVector(self.Points[1])
 			totalLength += (point - previousPoint).Magnitude
-			self.Model[i/N] = {totalLength, } -- we wont put the point number first, but the length, then the vector
-			
+			self.Model[i/N] = {totalLength, point-previousPoint} -- we wont put the point number first, but the length, then the vector to get there
 		end
 
 		self.Length = totalLength
@@ -211,7 +212,5 @@ function bezierSpline:CalculateLength():number
 	
 	return 0
 end
-
-
 
 return bezierSpline
