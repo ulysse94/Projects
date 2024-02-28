@@ -20,7 +20,7 @@ Nombre de déplacement accomplit par la fonction move.
 def printASCII():
     """
     Génère les tours en characters ASCII.
-    LES TOURS NE SONT PAS CENTREES.
+    LES TOURS NE SONT PAS CENTREES (ou presque).
     """
     space = 3
     #Espace entre chaque tour.
