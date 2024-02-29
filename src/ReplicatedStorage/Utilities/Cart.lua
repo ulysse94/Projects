@@ -97,6 +97,7 @@ function cart:GetRelativePosition(movingDistance:number):cartPosition?
 		local newSpline = self.Position.Spline
 		-- tant qu'on n'est pas au bout, on continue à chercher plus loin.
 		while movingDistance > newSpline.Length do
+			-- TODO: make it work with nodes.
 			local p = newSpline.Connections[math.sign(if newDirection < 0 then 1 else 2)]
 			-- this is not the spline yet, only its point.
 			-- to get the spline from a point, look for its parent name in the SplineIndex.
