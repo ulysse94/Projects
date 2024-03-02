@@ -1,6 +1,5 @@
 """
 Ce script résout le problème des tours de Hanoï.
-Le script a été créé en sorte que d'autres tours (autre que A, B et C) se rajoute au problème (D?).
 """
 
 from math import floor #Pour printASCII.
@@ -86,7 +85,7 @@ def createTower(pos:str="A",n:int=3):
     for i in range(n,0,-1):
         towers[pos].append(i)
 
-def resolve(n:int, start:str="A", end:str="C", auxiliary:str="B"):
+def solve(n:int, start:str="A", end:str="C", auxiliary:str="B"):
     """
     Fonction principale.
     Résout le problème avec n disques en start, devant aller en end, via auxiliary.
@@ -95,13 +94,13 @@ def resolve(n:int, start:str="A", end:str="C", auxiliary:str="B"):
         #easy
         move(start, end)
     else:
-        resolve(n-1, start, auxiliary, end)
+        solve(n-1, start, auxiliary, end)
         #déconstruire la tour
         move(start,end)
         #poser le plus gros disque
-        resolve(n-1, auxiliary, end, start)
+        solve(n-1, auxiliary, end, start)
         #on reconstruit la tour par dessus.
 
 createTower(n=5)
-resolve(5)
+solve(5)
 print("Réalisé en ", globals()["nMove"], " déplacements.", sep="")
