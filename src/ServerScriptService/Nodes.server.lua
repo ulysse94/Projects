@@ -51,8 +51,8 @@ end
 function generateCurves():nil
 	for _, section in pairs(railFolder:GetChildren()) do
 		if section:IsA("Model") then
-			local sortedPoints = sortPoints(section)
-			if #sortPoints(section) >= 2 then
+			local sortedPoints = nodeFunctions.sortPoints(section)
+			if #nodeFunctions.sortPoints(section) >= 2 then
 				local resolution = section:GetAttribute("SectionResolution") or nil
 				local spline = Splines[section:GetAttribute("SplineType") or "BezierSpline"].new(sortedPoints, resolution)
 

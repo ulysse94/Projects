@@ -27,12 +27,14 @@ end
 		- nil: not connected
 ]]
 function nodeFunctions.getConnectedSectionSide(section:Model|BasePart?, connectedSection:Model|BasePart?):number?
+---@diagnostic disable-next-line: invalid-class-name
 	if typeof(connectedSection)=="Model" then
 		if connectedSection:GetAttribute("FrontConnection") == section.Name then
 			return 2
 		elseif connectedSection:GetAttribute("BackConnection") == section.Name then
 			return 1
 		end
+---@diagnostic disable-next-line: invalid-class-name
 	elseif typeof(connectedSection)=="BasePart" then
 		-- it's a node.
 		if connectedSection:GetAttribute("BackConnection") == section.Name then
@@ -85,6 +87,7 @@ end
 function nodeFunctions.sortPoints(section:Model):{BasePart}
 	local sorted = section:GetChildren()
 	for i, inst in ipairs(sorted) do
+---@diagnostic disable-next-line: invalid-class-name
 		if typeof(inst) ~= "BasePart" and not tonumber(inst.Name) then
 			table.remove(sorted, i)
 		end
