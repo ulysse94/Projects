@@ -26,6 +26,12 @@ Dans ce repositoire GitHub, j'ai décidé de n'y faire figurer seulement mon pro
 
 Les autres projets que j'ai eus et qui ne figure pas ici n'ont jamais été annoté, et rendrai la lecture de ce repositoire bien plus difficile. C'est pourquoi j'ai décidé de ne mettre que ce projet.
 
+### Structure
+
+Tout d'abord, tout les objets sur des rails seront appeler des *carts*. Ces carts auront comme propriété : leur position sur un rail/une section, leur direction (1 ou -1), et quelques fonctions qui nous permettront de connaitre la position à une distance d de lui (i.e. la position sur le rail d mètres plus loin).
+
+J'ai choisi de modéliser tout les rails avec des splines (surtout Bézier), ce qui me permetra plus tard de définir et connaitre la position d'un objet
+
 ### Matrix
 *../scr/ReplicatedStorage/Utilities/Matrix.lua*
 
