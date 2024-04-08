@@ -28,11 +28,21 @@ Les autres projets que j'ai eus et qui ne figure pas ici n'ont jamais été anno
 
 ### Structure
 
-Tout d'abord, tout les objets sur des rails seront appeler des *carts*. Ces carts auront comme propriété : leur position sur un rail/une section, leur direction (1 ou -1), et quelques fonctions qui nous permettront de connaitre la position à une distance d de lui (i.e. la position sur le rail d mètres plus loin).
+#### Carts
 
-J'ai choisi de modéliser tout les rails avec des splines (surtout Bézier), ce qui me permetra plus tard de définir et connaitre la position d'un objet
+Tout d'abord, tout les objets sur des rails seront appeler des *carts*. Ces carts auront comme propriété : leur position sur un rail/une section, leur direction (1 ou -1), et quelques fonctions qui nous permettront de connaitre la position à une distance d de lui (i.e. la position sur le rail d mètres plus loin). Pour cela, il faut utiliser les propriétés *Connections* des sections (cf. ci-dessous).
 
-### Matrix
+##### Sections & Nodes
+
+J'ai choisi de modéliser tout les rails avec des splines (surtout Bézier), ce qui me permetra plus tard de définir et connaitre la position d'un objet ainsi que sa directions très facilement. Ces rails seront des *sections*. Ces sections pourront être connecter dans leurs propriétés : une *BackConnection* et une *FrontConnection*. Notons que ces deux sections sont dans une liste à deux éléments (*Connections*), sous les propriétés de l'objet *section*.
+
+Pour les *points*, ou aiguillages, des *nodes* seront utilisés. Ils seront utilisés comme des *sections* mais dont la longueur est nulle, et seulement leur connections avec les autres sections seront utilisées. Leurs propriétés déterminent ainsi les connections faites : une *BackConnection*, qui désignera uniquement une seule section en arrière du *node*, puis des *FrontConnections* (liste). Une propriété supplémentaire, *SwitchPosition*, détermine quelle *FrontConnection* est en cours d'utilisation.
+
+*Les scripts Nodes.server.lua et NodeFunctions.lua sont des scripts dont les noms risquent de changer, et n'ont strictement rien à voir avec la class Node.*
+
+#### 
+
+### Module matrice
 *../scr/ReplicatedStorage/Utilities/Matrix.lua*
 
 Ce module me permet de gérer des matrices. Il peut aussi inverser des matrices d'ordre 2 et 3. Je n'ai pas cherché à l'étendre pour des matrices plus grandes, n'en ayant besoin que pour des matrices de vecteurs dans l'espace et le plan.
@@ -40,8 +50,10 @@ Ce module me permet de gérer des matrices. Il peut aussi inverser des matrices 
 ### Splines
 *../scr/ReplicatedStorage/Utilities/Splines/ (2 scripts)*
 
-*(CatmullRomSpline.lua exclut. Ce module n'a pas été fait par moi et m'a servi exclusivement de test et pour l'inspiration.)*
+Ces modules me permettent de générer les "rails" du circuit, et les *sections*. En effet, ces rails sont modélisés par des courbes de Bézier, et parfois des lignes droites, comme l'indique les 2 classes. J'aurai pu utiliser une super-class "Spline" dont les classes "Bezier" et "Line" hériteraient, mais comme la manière de caculer et de procéder étaient très différentes, j'ai décidé de faire deux classes séparées.
 
-Ces modules me permettent de générer les "rails" du circuit. En effet, ces rails sont modélisés par des courbes de Bézier, et parfois des lignes droites, comme l'indique les 2 classes. J'aurai pu utiliser une super-class "Spline" dont les classes "Bezier" et "Line" hériteraient, mais comme la manière de caculer et de procéder étaient très différentes, j'ai décidé de faire deux classes séparées.
+### Rails et modélisation
 
-## Roadmap
+La modélisation des rails est un peu plus compliquée. Même si j'ai l'expression de la courbe, il faut placé dans l'espace 3D 2 courbes parallèles, simplifiées en plusieurs segments. 
+
+Il est donc nécessaire de faire un algorithme de pavage qui peut placé ces segments de manière dynamique, sans laissé de trous entre-eux. Cet algorithme de pavage pourra aussi être utilisé pour passer les traverses, puis, avec une gestion des données particulières, le placement des fenêtres ou des décorations d'une facade de batiment.
