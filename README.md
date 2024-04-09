@@ -44,6 +44,12 @@ Pour les *points*, ou aiguillages, des *nodes* seront utilisés. Ils seront util
 
 *Les scripts Nodes.server.lua et NodeFunctions.lua sont des scripts dont les noms risquent de changer, et n'ont strictement rien à voir avec la class Node.*
 
+Les *sections* et les *nodes* sont pré-modélisés dans l'environement par des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model), tous dans un [Folder](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Folder) unique, dont les points de contrôles sont modélisés par des [Part](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Part). Cela permet de stocker et préserver le réseau de *sections*/*nodes* sans à avoir modifier un fichier JSON, mais qui peut être visuelement modifié dans Roblox Studio. Ainsi, les objets qui sont créés utiliseront ces Parts et l'environement pour fonctionner correctement (cf. ../scr/ReplicatedStorage/Utilities/NodeFunctions.lua).
+
+La propriété "Connections" des sections sont des Parts : c'est le point de contrôle de la section connectée (premier ou dernier). Par exemple, pour une section A connectée à l'avant à une section B, et la section B connecté à l'arrière à la sections A, on aura :
+- Pour A : Connections = {[1] = rien/nil, [2] = Premier point de la section B}
+- Pour B : Connections = {[1] = Dernier point de la section A, [2] = rien/nil}
+
 #### 
 
 ### 2.2 Module matrice

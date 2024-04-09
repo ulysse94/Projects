@@ -26,9 +26,10 @@ end
 		- 2: front (CAN BE A NODE, AND NOT BEING CONNECTED.)
 		- nil: not connected
 ]]
-function nodeFunctions.getConnectedSectionSide(section:Model|BasePart?, connectedSection:Model|BasePart?):number?
+function nodeFunctions.getConnectedSectionSide(section:Model|BasePart|{}?, connectedSection:Model|BasePart|{}?):number?
 ---@diagnostic disable-next-line: invalid-class-name
 	if typeof(connectedSection)=="Model" then
+		-- it's a section
 		if connectedSection:GetAttribute("FrontConnection") == section.Name then
 			return 2
 		elseif connectedSection:GetAttribute("BackConnection") == section.Name then
@@ -41,6 +42,12 @@ function nodeFunctions.getConnectedSectionSide(section:Model|BasePart?, connecte
 			return 1
 		else
 			return 2
+		end
+	elseif typeof(connectedSection)=="table" and typeof(connectedSection)=="table" then
+		if connectedSection.Connections[2] == section.Name then
+			return 2
+		elseif connectedSection.Connections[1] == section.Name then
+			return 1
 		end
 	end
 	return
@@ -55,25 +62,34 @@ end
 		}
 ]]
 function nodeFunctions.getBackAndFrontPoints(section:Model):{[number]:BasePart}
-	-- we got the main table.
-	-- add the +1 and -1 part to get something more coherent.
-	-- only useful if you use Catmull Rom splines, but we use bezier here, so bye bye
 	local result = {}
 	local connections = nodeFunctions.getConnectedSection(section)
 
-	if connections[1] then --back connection
-		if nodeFunctions.getConnectedSectionSide(section, connections[1]) == 1 then -- 1 = back
-			result[1] = connections[1]:FindFirstChild("1")
-		else -- 2 = front
-			result[1] = connections[1]:FindFirstChild(tostring(#connections[1]:GetChildren()))
+	if connections[1] then -- back connection
+---@diagnostic disable-next-line: invalid-class-name
+		if typeof(connections[1])=="Model" then -- section
+			if nodeFunctions.getConnectedSectionSide(section, connections[1]) == 1 then -- 1 = back
+				result[1] = connections[1]:FindFirstChild("1")
+			else -- 2 = front
+				result[1] = connections[1]:FindFirstChild(tostring(#connections[1]:GetChildren()))
+			end
+---@diagnostic disable-next-line: invalid-class-name
+		elseif typeof(connections[2]) == "Part" then -- node
+			result[1] = connections[1]
 		end
 	end
 
-	if connections[2] then --front connection
-		if nodeFunctions.getConnectedSectionSide(section, connections[2]) == 2 then -- 2 = front
-			result[2] = connections[2]:FindFirstChild(tostring(#connections[1]:GetChildren()))
-		else -- 1 = back
-			result[2] = connections[2]:FindFirstChild("1")
+	if connections[2] then -- front connection
+	---@diagnostic disable-next-line: invalid-class-name
+		if typeof(connections[2])=="Model" then -- section
+			if nodeFunctions.getConnectedSectionSide(section, connections[2]) == 1 then -- 1 = back
+				result[2] = connections[2]:FindFirstChild("1")
+			else -- 2 = front
+				result[2] = connections[2]:FindFirstChild(tostring(#connections[2]:GetChildren()))
+			end
+		---@diagnostic disable-next-line: invalid-class-name
+		elseif typeof(connections[2]) == "Part" then -- node
+			result[2] = connections[2]
 		end
 	end
 
