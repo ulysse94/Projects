@@ -26,7 +26,7 @@ end
 		- 2: front (CAN BE A NODE, AND NOT BEING CONNECTED.)
 		- nil: not connected
 ]]
-function nodeFunctions.getConnectedSectionSide(section:Model|BasePart|{}?, connectedSection:Model|BasePart|{}?):number?
+function nodeFunctions.getConnectedSectionSide(section:Model|BasePart?, connectedSection:Model|BasePart?):number?
 ---@diagnostic disable-next-line: invalid-class-name
 	if typeof(connectedSection)=="Model" then
 		-- it's a section
@@ -43,12 +43,13 @@ function nodeFunctions.getConnectedSectionSide(section:Model|BasePart|{}?, conne
 		else
 			return 2
 		end
-	elseif typeof(connectedSection)=="table" and typeof(connectedSection)=="table" then
-		if connectedSection.Connections[2] == section.Name then
-			return 2
-		elseif connectedSection.Connections[1] == section.Name then
-			return 1
-		end
+	--unused
+	-- elseif typeof(connectedSection)=="table" and typeof(connectedSection)=="table" then
+	-- 	if connectedSection.Connections[2] == section.Name then
+	-- 		return 2
+	-- 	elseif connectedSection.Connections[1] == section.Name then
+	-- 		return 1
+	-- 	end
 	end
 	return
 end

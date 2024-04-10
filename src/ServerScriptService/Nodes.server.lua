@@ -7,6 +7,7 @@ for _, module in pairs(game.ReplicatedStorage.Utilities.Splines:GetChildren()) d
 		Splines[module.Name] = require(module)
 	end
 end
+local NodeClass = require(game.ReplicatedStorage.Utilities.Node)
 
 local railFolder = workspace.Rails
 
@@ -76,8 +77,29 @@ function generateCurves():nil
 			else error("Section "..section.." does not have enough points (>=2)")
 			end
 		elseif section:IsA("Part") then
-			-- The section turns out to be a node... not a part!
-			-- TODO: node.
+			-- The section turns out to be a node... not a spline!
+			local back = section:GetAttribute("BackConnection")
+			local front = section:GetAttribute("FrontConnections")
+			front = string.split(front, ",") --cf readme
+
+			back = railFolder:FindFirstChild(back)
+			table.foreachi(front, function(i,v)
+				front[i] = railFolder:FindFirstChild(v)
+			end)
+
+			local node = NodeClass.new(section, back, front)
+			splineIndex[section.Name] = node
+
+			local fPoint = nil
+			local side = nodeFunctions.getConnectedSectionSide(section, back)
+			if side == 1 then -- back
+				fPoint = back:FindFirstChild("1")
+			elseif side == 2 then -- front
+				fPoint = back:FindFirstChild(tostring(#back:GetChildren()))
+			end
+			node.Connections[1] = fPoint
+
+			-- node:UpdatePosition(1)
 		end
 	end
 

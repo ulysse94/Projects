@@ -8,30 +8,29 @@ local nodeFunctions = require(game.ReplicatedStorage.Utilities.NodeFunctions)
 
 --[[
 	Creates a new node.
-	Note that __back section must be unique__, while there can be multiple front sections.
+	Note that **back section must be unique**, while there can be multiple front sections.
 	Do not use for crossovers.
 	backSection and frontSections are spline objects.
+	backSection is unique, while frontSections is a list.
 	`Model` is the BasePart which represents the node.
 ]]
-function node.new(model:BasePart, backSection, frontSections:{})
+function node.new(model:BasePart, backSection:Model, frontSections:{Model})
 	local self = {}
 
+	self.Length = 0
 	self.Part = model
-    self.BackSection = backSection
-	self.FrontSections = frontSections
+    self.BackSection = backSection -- unique
+	self.FrontSections = frontSections -- list
 	self.SwitchPosition = 1
 
-	--[[This property gives the same thing as a spline:
-
+	--[[
+	This property gives the same thing as a spline:
 	{
 		[1]=back connection point,
 		[2]=(current) front connection point
 	}
 	]]
-	self.Connections = {
-		[1] = self.BackSection,
-		[2] = nil
-	}
+	self.Connections = {}
 
 	setmetatable(self, {
 		__index = node,
@@ -45,14 +44,31 @@ function node.new(model:BasePart, backSection, frontSections:{})
 	return self
 end
 
+-- Update Connections property.
 function node:UpdatePosition(newPosition:number):nil
 	newPosition = newPosition%(#self.FrontSections) -- clamping
 	self.SwitchPosition = newPosition
-	self.Connections[2] = self.FrontSections[self.SwitchPosition]
-	assert(self.Connections[2]["Points"], 'Incorrect connection in node. Does not have a "Points" property set.')
+	local nSection = self.FrontSections[self.SwitchPosition]
 
-	local section = self.Connections[2]["Points"][1].Parent
+	assert(self.FrontSections[self.SwitchPosition]:GetAttribute("BackConnection") or self.FrontSections[self.SwitchPosition]:GetAttribute("FrontConnection"), 
+	'Incorrect connection with node. FrontSection does not have a "Back"/"Front"Connection attribute set.')
+	local fPoint = nil
 
+	local side = nodeFunctions.getConnectedSectionSide(self.Part, nSection)
+
+	if side == 1 then -- back
+		fPoint = nSection:FindFirstChild("1")
+	elseif side == 2 then -- front
+		fPoint = nSection:FindFirstChild(tostring(#nSection:GetChildren()))
+	end
+
+	self.Connections[2] = fPoint
+
+	return
+end
+
+function node:UpdateFrontSections(newConnections:{}):nil
+	-- TODO: update frontsections with self:UpdatePosition(), check if self.Part attributes are the same.
 
 	return
 end

@@ -50,7 +50,7 @@ La propriété "Connections" des sections sont des Parts : c'est le point de con
 - Pour A : Connections = {[1] = rien/nil, [2] = Premier point de la section B}
 - Pour B : Connections = {[1] = Dernier point de la section A, [2] = rien/nil}
 
-#### 
+Ces Connections sont définies dans des [*Attributes* ](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Instance#GetAttribute) des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model) des *sections* et *nodes*, sous la forme d'une valeur de type string, qui correspond au nom de la section/noeud (ou numéro). Comme les nodes sont des aiguillages, et ont, par définition, plusieurs connections possibles (seulement sur le côté avant), leurs connections sont séparés par une virgule ",". Ainsi les *nodes* et *sections* ne peuvent qu'avoir des noms différents. 
 
 ### 2.2 Module matrice
 *../scr/ReplicatedStorage/Utilities/Matrix.lua*
@@ -62,7 +62,11 @@ Ce module me permet de gérer des matrices. Il peut aussi inverser des matrices 
 
 Ces modules me permettent de générer les "rails" du circuit, et les *sections*. En effet, ces rails sont modélisés par des courbes de Bézier, et parfois des lignes droites, comme l'indique les 2 classes. J'aurai pu utiliser une super-class "Spline" dont les classes "Bézier" et "Line" hériteraient, mais comme la manière de calculer et de procéder étaient très différentes, j'ai décidé de faire deux classes séparées.
 
-### 2.4 Rails et modélisation
+### 2.4 GuiLib
+
+GuiLib rassemble plusieurs classes (sans super-classe) qui permettent la création de certains objets d'interface graphique, qui ne sont pas déjà inclu dans le moteur de Roblox. On peut y retrouver Dropdown, Slider, etc. Les classes ne sont pas toutes terminées ou toutes testées, mais doivent fonctionner.
+
+### 2.5 Rails et modélisation (à faire)
 
 La modélisation des rails est un peu plus compliquée. Même si j'ai l'expression de la courbe, il faut placer dans l'espace 3D 2 courbes parallèles, simplifiées en plusieurs segments. 
 
