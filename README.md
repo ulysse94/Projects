@@ -34,11 +34,13 @@ Tout d'abord, tous les objets sur des rails seront appeler des *carts*. Ces cart
 
 La classe *carts* est une super-classe, dont d'autres classes comme "signal" ou "crossing" hériteront.
 
-##### 2.1.2 Sections & Nodes
+##### 2.1.2 Section
 
 J'ai choisi de modéliser tous les rails avec des splines (surtout Bézier), ce qui me permettra plus tard de définir et connaitre la position d'un objet ainsi que sa direction très facilement : 1 ou -1 en fonction du premier point de contrôle de la section (et du spline). En effet, contrairement à des listes de points, ces courbes pourront être défini qu'avec un petit nombre de données : les points de contrôle, qui sont uniquement des [Vector3](https://create.roblox.com/docs/fr-fr/reference/engine/datatypes/Vector3). 
 
 Ces rails seront des *sections*. Ces sections pourront être connecter dans leurs propriétés : une *BackConnection* et une *FrontConnection*. Notons que ces deux sections sont dans une liste à deux éléments (*Connections*), sous les propriétés de l'objet *section*.
+
+#### 2.1.3 Nodes
 
 Pour les *points*, ou aiguillages, des *nodes* seront utilisés. Ils seront utilisés comme des *sections* mais dont la longueur est nulle, et seulement leur connections avec les autres sections seront utilisées. Leurs propriétés déterminent ainsi les connections faites : une *BackConnection*, qui désignera uniquement une seule section en arrière du *node*, puis des *FrontConnections* (liste). Une propriété supplémentaire, *SwitchPosition*, détermine quelle *FrontConnection* est en cours d'utilisation.
 
@@ -46,11 +48,15 @@ Pour les *points*, ou aiguillages, des *nodes* seront utilisés. Ils seront util
 
 Les *sections* et les *nodes* sont pré-modélisés dans l'environement par des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model), tous dans un [Folder](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Folder) unique, dont les points de contrôles sont modélisés par des [Part](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Part). Cela permet de stocker et préserver le réseau de *sections*/*nodes* sans à avoir modifier un fichier JSON, mais qui peut être visuelement modifié dans Roblox Studio. Ainsi, les objets qui sont créés utiliseront ces Parts et l'environement pour fonctionner correctement (cf. ../scr/ReplicatedStorage/Utilities/NodeFunctions.lua).
 
+#### 2.1.4 Connections
+
 La propriété "Connections" des sections sont des Parts : c'est le point de contrôle de la section connectée (premier ou dernier). Par exemple, pour une section A connectée à l'avant à une section B, et la section B connecté à l'arrière à la sections A, on aura :
 - Pour A : Connections = {[1] = rien/nil, [2] = Premier point de la section B}
 - Pour B : Connections = {[1] = Dernier point de la section A, [2] = rien/nil}
 
 Ces Connections sont définies dans des [*Attributes* ](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Instance#GetAttribute) des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model) des *sections* et *nodes*, sous la forme d'une valeur de type string, qui correspond au nom de la section/noeud (ou numéro). Comme les nodes sont des aiguillages, et ont, par définition, plusieurs connections possibles (seulement sur le côté avant), leurs connections sont séparés par une virgule ",". Ainsi les *nodes* et *sections* ne peuvent qu'avoir des noms différents. 
+
+Ces connections sont permanentes pour les *sections*, et ne peuvent être supprimées ou modifiées tant que la simulation n'est pas réinitialisée. Pour les *nodes*, ces connections peuvent être mises à jour, ce qui pourrait être pratique pour des plaques tournante, ou des mécanismes particuliers.
 
 ### 2.2 Module matrice
 *../scr/ReplicatedStorage/Utilities/Matrix.lua*

@@ -14,7 +14,7 @@ local nodeFunctions = require(game.ReplicatedStorage.Utilities.NodeFunctions)
 	backSection is unique, while frontSections is a list.
 	`Model` is the BasePart which represents the node.
 ]]
-function node.new(model:BasePart, backSection:Model, frontSections:{Model})
+function node.new(model:BasePart, backSection:Model, frontSections:{Model?})
 	local self = {}
 
 	self.Length = 0
@@ -67,8 +67,22 @@ function node:UpdatePosition(newPosition:number):nil
 	return
 end
 
-function node:UpdateFrontSections(newConnections:{}):nil
-	-- TODO: update frontsections with self:UpdatePosition(), check if self.Part attributes are the same.
+function node:UpdateFrontSections(newConnections:{Model?}):nil
+	--checking if the attribute is the same
+	local nS = ""
+	table.foreachi(newConnections, function(k,v)
+		nS = nS..","..v.Name
+	end)
+	self.Part:SetAttribute("FrontConnection",nS)
+
+	--updating properties
+	self.FrontSections = newConnections
+	self.SwitchPosition = self.SwitchPosition%(#self.FrontSections)
+
+	--updating position
+	node:UpdatePosition(self.SwitchPosition)
+
+	--done!
 
 	return
 end
