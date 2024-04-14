@@ -26,6 +26,8 @@ Dans ce repositoire GitHub, j'ai décidé de n'y faire figurer seulement mon pro
 
 Les autres projets que j'ai eus et qui ne figure pas ici n'ont jamais été annoté, et rendrai la lecture de ce repositoire bien plus difficile. C'est pourquoi j'ai décidé de ne mettre que ce projet.
 
+Le moteur physique de Roblox ne nécessite pas l'utilisation de Blender pour la création de modèles 3D. Il laisse la possibilité d'utiliser des solides simples (cubes, spheres, etc.) puis d'utiliser de la géométrie de construction de solides pour former des modèles plus complexes. Ce processus reste tout de même moins optimisé qu'importer des modèles provenant de Blender.
+
 ### 2.1 Structure et données
 
 #### 2.1.1 Carts
