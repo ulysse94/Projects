@@ -7,7 +7,7 @@ local matrix = require(game.ReplicatedStorage.Utilities.Matrix)
 --[[
 	Creates a new Spline object
 ]]
-function bezierSpline.new(controlPoints: {Vector2} | {Vector3 | BasePart}?, resolution:number?)
+function bezierSpline.new(controlPoints: {BasePart}, resolution:number?)
 	local self = {}
 	
 	self.Type = "Bezier"

@@ -9,7 +9,7 @@ local matrix = require(game.ReplicatedStorage.Utilities.Matrix)
 --[[
 	Creates a new Line object
 ]]
-function line.new(controlPoints: {Vector2} | {Vector3 | BasePart}?, resolution:number?)
+function line.new(controlPoints: {BasePart}, resolution:number?)
 	local self = {}
 	
 	self.Type = "Line"
