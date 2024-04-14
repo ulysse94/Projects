@@ -1,6 +1,8 @@
 --!strict
 --[[Ulysse94]]--
 
+-- unoptimized line. use bezier instead.
+
 local line = {}
 local matrix = require(game.ReplicatedStorage.Utilities.Matrix)
 
