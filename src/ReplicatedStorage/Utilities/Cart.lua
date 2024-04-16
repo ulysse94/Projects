@@ -120,10 +120,13 @@ function cart:GetRelativePosition(movingDistance:number):any
 						newDirection = -1 -- we are coming from the forward section, going backward.
 					end
 				elseif SplineIndex[p.Name] then
-					-- it is a point.
+					-- it is a node.
 					--movingDistance -= newSpline.Length -- it is 0! not setting it!
+
+					-- to determine the direction now, we need to check the entry point (where we are entering the node)
+					-- since it is a node, we have to use the point, and not the section. we use the .Connections, much easier this way.
 					local oldPoint = newSpline.Points
-					if newDirection == -1 then
+					if newDirection == -1 then -- we determine the last point by using the last direction used.
 						oldPoint = oldPoint[1]
 					else
 						oldPoint = oldPoint[#oldPoint]
