@@ -50,6 +50,10 @@ function node:UpdatePosition(newPosition:number):nil
 	self.SwitchPosition = newPosition
 	local nSection = self.FrontSections[self.SwitchPosition]
 
+	if not nSection then
+		self.Connections[2] = nil
+		return -- empty connection!
+	end
 	assert(self.FrontSections[self.SwitchPosition]:GetAttribute("BackConnection") or self.FrontSections[self.SwitchPosition]:GetAttribute("FrontConnection"), 
 	'Incorrect connection with node. FrontSection does not have a "Back"/"Front"Connection attribute set.')
 	local fPoint = nil
