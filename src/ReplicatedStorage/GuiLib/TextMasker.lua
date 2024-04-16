@@ -40,11 +40,11 @@ Methods:
 	Destroy () -> nil
 
 Events:
-	Filtered (filteredcharacter [number])
-		Fires each time a character is filtered. Passes the byte code of the character.
-		
-	Unfiltered (newtext [string])
-		Fired when nothing was filtered from the new input, and passes the new text.
+	Filtered (original [string])
+		Fires each time a character is filtered. Gives original string.
+
+	Unfiltered ()
+		Fired when nothing was filtered from the new input.
 	
 ]]
 
@@ -53,7 +53,7 @@ local Lib = script.Parent
 
 local Class = {}
 
-export type ListMode = "WhitelistChar"|"BlacklistChar"|"Interger"|"Float"
+export type ListMode = "WhitelistCharacter"|"BlacklistCharacter"|"Integer"|"Float"
 
 Class.__index = Class
 Class.__type = "TextMasker"
@@ -87,26 +87,26 @@ function Class:Filter(str:string):string
 	--Get last char.
 	local ret = ""
 	local len = str:len()
-	local char = str:sub(len,len-1)
 
-	if (table.find(self.List,char) or table.find(self.List,string.byte(char))) and self.ListMode == "BlacklistChar" then
+	if self.ListMode == "BlacklistCharacter" then
 		--Blacklist
-		ret = string.sub(str, 1, length)
-		self._FilteredEvent:Fire(char)
-	elseif self.ListMode == "WhitelistChar" then
+		ret = string.gsub(str, "["..table.concat(self.List,"").."]")
+		
+	elseif self.ListMode == "WhitelistCharacter" then
 		--Whitelist
-		
-
-		self._FilteredEvent:Fire(char)
+		self._FilteredEvent:Fire()
 	elseif self.CharacterLimit and len > self.CharacterLimit then
-		
-
-		self._FilteredEvent:Fire(char)
-	elseif self.ListMode == "" then
-		ret = string.gsub(str, "[^%d.]", "")
+		self._FilteredEvent:Fire()
+	elseif self.ListMode == "Float" then
+		ret = string.match(str, "%d+%.?%d*") -- "[number] . [number]". allows integers AND floats to be passed.
+	elseif self.ListMode == "Integer" then
+		ret = string.match(str, "%d+")
+	end
+	
+	if ret ~= str then
+		self._FilteredEvent:Fire(str)
 	else
-		--Unfiltered
-		self._UnfilteredEvent:Fire(ret)
+		self._UnfilteredEvent:Fire()
 	end
 
 	return ret
