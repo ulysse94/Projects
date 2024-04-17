@@ -8,19 +8,20 @@ local CartIndex = _G.CartIndex
 assert(SplineIndex and CartIndex, "Cannot load module without _G.SplineIndex and _G.CartIndex defined.")
 
 export type cartPosition = {
-	["Spline"]:{}, -- spline object
+	["Spline"]:string, -- spline object NAME
 	["Time"]:number, -- t position on the spline object
-	["Direction"]:number -- in what direction.
+	["Direction"]:number, -- in what direction.
 	-- <0: the train is going towards point 1 of the spline.
 	-- >0: the train is going towards the last point of the spline.
 	-- this direction is set WHEN THE OBJECT IS SPAWNED, AND SHOULD NOT CHANGE.
+	["CFrame"]:CFrame
 }
 
 --[[
 	Creates a new cart object.
 	The cart object is ONLY representing objects on tracks, and eventually handling moving objects on those.
 ]]
-function cart.new(name:string, startPosition:cartPosition, model:Model)
+function cart.new(name:string, startPosition:cartPosition?, model:Model)
 	local self = {}
 
 	self.Name = name
@@ -33,14 +34,20 @@ function cart.new(name:string, startPosition:cartPosition, model:Model)
 	})
 
 	self.Model = model
-	self.Position = startPosition
+	self.Position = startPosition or nil
 	self.ForwardSpace = 0
 	self.BackwardSpace = 0
 
 	return self
 end
 
--- scans the section
+function cart:Move(newPosition:cartPosition):nil
+	
+
+	return
+end
+
+-- scans the section for other potential carts
 function cart:ScanSection(...:number?):any?
 	local orders = {...}
 
@@ -51,20 +58,17 @@ function cart:ScanSection(...:number?):any?
 	return
 end
 
-function cart:UpdateModel():nil
-
-
-	return
-end
-
 --[[ gets the position that is forward/backward, movingDistance being a distance in studs (+/-).
-Returns **TUPLES**:
+
+	Returns **TUPLES**:
 
 -- CartPosition as usual
 
 -- Boolean, determines if the loop was forcibly broken because the connections did not allow to go that far.
 ]]
 function cart:GetRelativePosition(movingDistance:number):any
+	assert(self.Position~=nil, "Cart doesn't have a position yet.")
+
 	local currentSplineLength = self.Position.Spline.Length
 	local currentSplineTime = self.Position.Time
 	local currentDirection:number = self.Position.Direction
@@ -72,7 +76,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 	local newPosition = {
 		["Spline"] = nil,
 		["Direction"] = nil,
-		["Time"] = nil
+		["Time"] = nil,
+		["CFrame"] = nil
 	}
 	local broken = false
 
@@ -101,7 +106,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 			newDirection = -1
 		end
 
-		local newSpline = self.Position.Spline
+		local newSplineName = self.Position.Spline
+		local newSpline = SplineIndex[newSplineName]
 		-- tant qu'on n'est pas au bout, on continue à chercher plus loin.
 		while movingDistance > newSpline.Length do
 			local p = newSpline.Connections[math.sign(if newDirection < 0 then 1 else 2)]
@@ -112,6 +118,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 					-- it is a control point.
 					movingDistance -= newSpline.Length
 					newSpline = SplineIndex[p.Parent.Name]
+					assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Parent.Name.." from "..newSplineName)
+					newSplineName = p.Parent.Name
 
 					-- now set the new direction
 					if p.Name == "1" then
@@ -133,6 +141,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 					end
 
 					newSpline = SplineIndex[p.Name]
+					assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Name.." from "..newSplineName)
+					newSplineName = p.Name
 
 					if newSpline.Connections[1] == oldPoint then -- Connections[1] of a node is always set. Sometimes, Connections[2] isn't.
 						newDirection = 1
@@ -162,8 +172,9 @@ function cart:GetRelativePosition(movingDistance:number):any
 		end
 
 		newPosition.Time = newTime
-		newPosition.Spline = newSpline
+		newPosition.Spline = newSplineName
 		newPosition.Direction = newDirection
+		newPosition.CFrame = newSpline:CalculateCFrameAt(newTime)
 	end
 
 	return newPosition, broken
