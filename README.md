@@ -2,7 +2,7 @@
 
 Vous trouverez ici mes projets les plus récents en Python et Lua. J'ai aussi fait (dans le cadre d'un exercice guidé en mathématique) une fonction pour résoudre le problème des tours de Hanoï, qui une réécriture. 
 
-Mon code en Lua s'inscrit dans le moteur de [Roblox](https://create.roblox.com/docs/fr-fr/platform), un moteur 3D optimisé pour le jeux-vidéo et sa plateforme massivement-multijoueur. On peut coder sur le moteur de jeu en [Luau](https://luau-lang.org/). La plupart des annotations sont en anglais, mais certaines d'entre-elles sont en français. 
+Mon code en Lua s'inscrit dans le moteur de [Roblox](https://create.roblox.com/docs/fr-fr/platform), un moteur 3D optimisé pour le jeux-vidéo et sa plateforme massivement-multijoueur. On peut coder sur le moteur de jeu en [Luau](https://luau-lang.org/), qui est une version du Lua avec un typage graduelle à la place d'un typage faible. La plupart des annotations sont en anglais, mais certaines d'entre-elles sont en français. 
 
 Je n'ai pas utilisé d'IA (ChatGPT, Roblox CodeAssist, Blackbox) pour écrire ces scripts. Ces IA ne donnaient d'ailleurs que des réponses très vagues (lorsque je les ai testées pour d'autres choses plus simple), et dans le cas de la programmation, utilisaient des bouts d'API dépréciés/remplacés ou ne comprenaient pas la requête proprement.
 
@@ -58,7 +58,15 @@ La propriété "Connections" des sections sont des Parts : c'est le point de con
 
 Ces Connections sont définies dans des [*Attributes* ](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Instance#GetAttribute) des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model) des *sections* et *nodes*, sous la forme d'une valeur de type string, qui correspond au nom de la section/noeud (ou numéro). Comme les nodes sont des aiguillages, et ont, par définition, plusieurs connections possibles (seulement sur le côté avant), leurs connections sont séparés par une virgule ",". Ainsi les *nodes* et *sections* ne peuvent qu'avoir des noms différents. 
 
-Ces connections sont permanentes pour les *sections*, et ne peuvent être supprimées ou modifiées tant que la simulation n'est pas réinitialisée. Pour les *nodes*, ces connections peuvent être mises à jour, ce qui pourrait être pratique pour des plaques tournante, ou des mécanismes particuliers.
+Ces connections sont permanentes pour les *sections*, et ne peuvent être supprimées ou modifiées tant que la simulation n'est pas réinitialisée. Pour les *nodes*, ces connections peuvent être mises à jour, ce qui pourrait être pratique pour des plaques tournantes.
+
+#### 2.1.5 Indexation des *sections*
+
+Pour indexer les *sections*, ils sont représentées par des [Model](https://create.roblox.com/docs/fr-fr/reference/engine/classes/Model), et sont tous dans le même Folder. Mais les objets (cf. *../src/ReplicatedStorage/Utilities/Splines*) sont, quant à eux, indexés sous _G.SplineIndex (qui est comme un dictionaire, où la clé est le nom de la *section*).
+
+#### 2.1.6 Indexation des *carts*
+
+Pour la simulation des véhicules sur rails, il faut pouvoir détecter ce qu'il y a sur les rails, c'est-à-dire les *carts* qui sont sur les sections. Il faut les indexer pour les trouver. Comme il faut les associer à des emplacements, pour savoir facilement si tel ou tel *cart* se trouve sur une *section*, ils sont indexés dans 2 listes.
 
 ### 2.2 Module matrice
 *../scr/ReplicatedStorage/Utilities/Matrix.lua*
@@ -69,6 +77,14 @@ Ce module me permet de gérer des matrices. Il peut aussi inverser des matrices 
 *../scr/ReplicatedStorage/Utilities/Splines/ (2 scripts)*
 
 Ces modules me permettent de générer les "rails" du circuit, et les *sections*. En effet, ces rails sont modélisés par des courbes de Bézier, et parfois des lignes droites, comme l'indique les 2 classes. J'aurai pu utiliser une super-class "Spline" dont les classes "Bézier" et "Line" hériteraient, mais comme la manière de calculer et de procéder étaient très différentes, j'ai décidé de faire deux classes séparées.
+
+Pour définir la position des *carts* sur ces courbes, la longueur de celles-ci est calculer par morceaux. La courbe (en question) est découpée en parties égales et la distance parcourue sur chaque partie est ensuite additionner (méthode d'intégration la plus simple).
+
+Ces *sections* ont donc quelques propriétés. Ces propriétés sont visible dans l'espace 3D, sous la forme de *Parts* et de *Model*. Dans les *Attributes* de ces Parts, on peut trouver le *BankAngle*, qui indique l'inclinaison du rail. On peut, grâce à la fonction CalculateCFrameAt connaître la position d'un *cart* pour un certain temps t. 
+
+On rappelle que Roblox défini les orientations grâce à des quaternions. Par conséquent, il nous faut 3 vecteurs : le vecteur "haut" (UpVector), vers la droite et tout droit (resp. RightVector et LookVector). Ces vecteurs s'obtiennent grâce à la fonction dérivée (pour LookVector), par manipulation matricielle (pour les deux autres) et enfin grâce [au constructeur du moteur](https://create.roblox.com/docs/fr-fr/reference/engine/datatypes/CFrame#fromMatrix). Malheureusement, ces vecteurs ont une précision au millième près, à cause des limitations du moteur de Roblox. Ainsi, quand on fera le calcul, le résultat sera arrondit, et les vecteurs très légerement décalés. Ce décalage d'un millième est source de très gros bugs graphique (par exemple, j'ai réussi à avoir des cubes dont on ne voyait que les faces depuis l'intérieur). Pour régler ce problème, on choisit de simplifier le problème : on ne calcule que le "UpVector" et "LookVector" et on utilise [un constructeur différent](https://create.roblox.com/docs/fr-fr/reference/engine/datatypes/CFrame#lookAlong).
+
+Cette simplification peut poser problème. En effet, comme le RightVector n'est pas définie, on peut se retrouver avec des *carts* orientés dans la mauvaise direction. On peut régler ce problème en dissociant le *carts* qui est effectivement sur la *section* et utilise la CFrame calculer, et le modèle apparent de ce *cart*.
 
 ### 2.4 GuiLib
 
