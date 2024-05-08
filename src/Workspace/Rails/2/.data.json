@@ -1,0 +1,29 @@
+{
+	"className": "Model",
+	"properties": {
+		"Attributes": {
+			"BackConnection": {
+				"String": "1"
+			},
+			"SplineType": {
+				"String": "BezierSpline"
+			}
+		},
+		"WorldPivot": [
+			468.5,
+			0.5,
+			31.5,
+			-1,
+			0,
+			0,
+			0,
+			-1,
+			0,
+			0,
+			0,
+			1
+		],
+		"LevelOfDetail": "Enum.ModelLevelOfDetail.Automatic",
+		"ModelStreamingMode": "Enum.ModelStreamingMode.Default"
+	}
+}

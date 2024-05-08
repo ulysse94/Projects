@@ -1,0 +1,78 @@
+{
+	"className": "Part",
+	"properties": {
+		"CanQuery": true,
+		"Color": [
+			0.6392157077789307,
+			0.6352941393852234,
+			0.6470588445663452
+		],
+		"RightSurface": "Enum.SurfaceType.Smooth",
+		"FrontSurface": "Enum.SurfaceType.Smooth",
+		"TopSurface": "Enum.SurfaceType.Smooth",
+		"PivotOffset": [
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			1
+		],
+		"LeftSurface": "Enum.SurfaceType.Smooth",
+		"RootPriority": 0,
+		"Material": "Enum.Material.Plastic",
+		"Reflectance": 0,
+		"Size": [
+			1,
+			1,
+			1
+		],
+		"AssemblyAngularVelocity": [
+			0,
+			0,
+			0
+		],
+		"BackSurface": "Enum.SurfaceType.Smooth",
+		"BottomSurface": "Enum.SurfaceType.Smooth",
+		"CanCollide": true,
+		"CollisionGroup": "Default",
+		"CFrame": [
+			215.5,
+			27.5,
+			-68.5,
+			-1,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			-1
+		],
+		"EnableFluidForces": true,
+		"AssemblyLinearVelocity": [
+			0,
+			0,
+			0
+		],
+		"Rotation": [
+			180,
+			0,
+			180
+		],
+		"Transparency": 0,
+		"BrickColor": "Medium stone grey",
+		"Anchored": true,
+		"CanTouch": true,
+		"CastShadow": true,
+		"Shape": "Enum.PartType.Block",
+		"MaterialVariant": ""
+	}
+}

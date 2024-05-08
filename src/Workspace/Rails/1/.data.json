@@ -1,0 +1,26 @@
+{
+	"className": "Model",
+	"properties": {
+		"Attributes": {
+			"FrontConnection": {
+				"String": "2"
+			}
+		},
+		"WorldPivot": [
+			248.5,
+			0.5,
+			-68.5,
+			-1,
+			0,
+			0,
+			0,
+			1,
+			0,
+			0,
+			0,
+			-1
+		],
+		"LevelOfDetail": "Enum.ModelLevelOfDetail.Automatic",
+		"ModelStreamingMode": "Enum.ModelStreamingMode.Default"
+	}
+}
