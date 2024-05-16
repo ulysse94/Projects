@@ -4,6 +4,7 @@
 local cart = {}
 local SplineIndex = _G.SplineIndex
 local CartIndex = _G.CartIndex
+local CartSplineIndex = _G.CartSplineIndex
 
 assert(SplineIndex and CartIndex, "Cannot load module without _G.SplineIndex and _G.CartIndex defined.")
 
@@ -33,15 +34,26 @@ function cart.new(name:string, startPosition:cartPosition?, model:Model)
 		end,
 	})
 
+	self._LastReported = nil
+
 	self.Model = model
-	self.Position = startPosition or nil
+	self.Position = nil
 	self.ForwardSpace = 0
 	self.BackwardSpace = 0
+
+	table.insert(CartSplineIndex, self)
+
+	if startPosition then
+		self:Move(startPosition)
+	end
 
 	return self
 end
 
-function cart:Move(newPosition:cartPosition):nil
+-- Moves the cart while updating the cart-spline index.
+function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean):nil
+	self.Position = newPosition
+
 	
 
 	return

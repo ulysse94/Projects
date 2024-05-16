@@ -1,0 +1,20 @@
+{
+  "className": "Part",
+  "properties": {
+    "Anchored": true,
+    "Attributes": {
+      "FloorSize": {
+        "Vector2": [200.0, 200.0]
+      }
+    },
+    "BottomSurface": "Smooth",
+    "CFrame": [75, 6, 45, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "EnableFluidForces": false,
+    "Size": [4, 1, 2],
+    "TopSurface": "Smooth",
+    "Transparency": 1
+  }
+}

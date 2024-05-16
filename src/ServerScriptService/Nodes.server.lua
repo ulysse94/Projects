@@ -15,10 +15,12 @@ local nodeFunctions = require(game.ReplicatedStorage.Utilities.NodeFunctions)
 
 local splineIndex = {}
 local cartIndex = {}
+local cartSplineIndex = {}
 local partIndex = {}
 
-_G.SplineIndex = splineIndex -- _G is like shared
+_G.SplineIndex = splineIndex
 _G.CartIndex = cartIndex
+_G.CartSplineIndex = cartSplineIndex
 
 local step = .01 -- 1/step iteration per curve
 
@@ -83,7 +85,7 @@ function generateCurves():nil
 			front = string.split(front, ",") --cf readme
 
 			back = railFolder:FindFirstChild(back)
-			table.foreachi(front, function(i,v)
+			table.foreach(front, function(i,v)
 				front[i] = railFolder:FindFirstChild(v)
 			end)
 
