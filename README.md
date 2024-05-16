@@ -96,9 +96,11 @@ La modélisation des rails est un peu plus compliquée. Même si j'ai l'expressi
 
 Il est donc nécessaire de faire un algorithme de pavage qui peut placer ces segments de manière dynamique, sans laisser de trous entre eux. Cet algorithme de pavage pourra aussi être utilisé pour passer les traverses, puis, avec une gestion des données particulières, le placement des fenêtres ou des décorations d'une façade de bâtiment.
 
-### Application aux simulation routières
+### 2.6 Application aux simulation routières
 
 Avec quelques changements sur la manière dont les *carts* réagissent et bougent, il serait possible d'appliquer ce système à une simulation routière. Deux possibilités s'offrent alors :
 
 - la simulation est gérée par le système : les véhicules (*carts* spéciaux) ne sont ni simulés ni gérés par le moteur physique de Roblox.
 - la simulation est en partie gérée par le moteur physique : les *carts* ne seraient alors que des "guides", que des véhicules, gérés par le moteur physique, tenteraient de suivre dans le monde 3D. Cette alternative est le meilleur choix si les véhicules doivent réagir à l'environement.
+
+### 2.7 Building system
