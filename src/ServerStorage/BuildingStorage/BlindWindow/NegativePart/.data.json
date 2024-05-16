@@ -1,0 +1,8 @@
+{
+  "className": "NegateOperation",
+  "properties": {
+    "CFrame": [1.249999, 12.992477, -57.5, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "EnableFluidForces": false,
+    "Size": [9.499999, 8.499999, 4.5]
+  }
+}

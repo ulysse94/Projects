@@ -1,0 +1,16 @@
+{
+  "className": "Model",
+  "properties": {
+    "Attributes": {
+      "DefaultOffset": {
+        "Vector3": [0.0, 1.2, 0.0]
+      }
+    },
+    "WorldPivotData": {
+      "OptionalCFrame": {
+        "position": [0.0, -2.0, 0.0],
+        "orientation": [[-1.0, 1.509958e-7, 6.600236e-15], [0.0, -4.371139e-8, 1.0], [1.509958e-7, 1.0, 4.371139e-8]]
+      }
+    }
+  }
+}

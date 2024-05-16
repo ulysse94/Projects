@@ -1,0 +1,20 @@
+{
+  "className": "MeshPart",
+  "properties": {
+    "Anchored": true,
+    "BackSurface": "SmoothNoOutlines",
+    "BottomSurface": "SmoothNoOutlines",
+    "CFrame": [0, -2, 0, -1, 0, 0, 0, 0, 1, 0, 1, 0],
+    "Color": {
+      "Color3uint8": [27, 42, 53]
+    },
+    "EnableFluidForces": false,
+    "FrontSurface": "SmoothNoOutlines",
+    "LeftSurface": "SmoothNoOutlines",
+    "Material": "SmoothPlastic",
+    "RightSurface": "SmoothNoOutlines",
+    "Size": [2.5, 2.4, 4.5],
+    "TextureID": "rbxassetid://474380592",
+    "TopSurface": "SmoothNoOutlines"
+  }
+}
