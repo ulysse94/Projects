@@ -104,3 +104,5 @@ Avec quelques changements sur la manière dont les *carts* réagissent et bougen
 - la simulation est en partie gérée par le moteur physique : les *carts* ne seraient alors que des "guides", que des véhicules, gérés par le moteur physique, tenteraient de suivre dans le monde 3D. Cette alternative est le meilleur choix si les véhicules doivent réagir à l'environement.
 
 ### 2.7 Building system
+
+En essayant de construire des bâtiments rapidement, j'ai eu l'idée de faire ce système. Il permet de construire des surfaces (sols), murs (en fonction de ces surfaces) et objets. En utilisant le moteur CGS de Roblox, j'ai pu optimisé le nombre de *Parts* utilsés avec des *Unions* (de *Parts*, éventuellement de *NegativeParts*). Il n'est toutefois pas terminé et je souhaite encore faire un objet qui permettrait de créer des murs ou des figures dont les dimensions et formes ne sont pas prédéfinies.
