@@ -76,6 +76,7 @@ function generateCurves():nil
 				spline["Connections"] = nodeFunctions.getBackAndFrontPoints(section)
 
 				splineIndex[section.Name] = spline
+				cartSplineIndex[section.Name] = {}
 			else error("Section "..section.." does not have enough points (>=2)")
 			end
 		elseif section:IsA("Part") then
@@ -91,6 +92,7 @@ function generateCurves():nil
 
 			local node = NodeClass.new(section, back, front)
 			splineIndex[section.Name] = node
+			cartSplineIndex[section.Name] = {}
 
 			local fPoint = nil
 			local side = nodeFunctions.getConnectedSectionSide(section, back)

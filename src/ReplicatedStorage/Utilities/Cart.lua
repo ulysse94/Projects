@@ -9,7 +9,7 @@ local CartSplineIndex = _G.CartSplineIndex
 assert(SplineIndex and CartIndex, "Cannot load module without _G.SplineIndex and _G.CartIndex defined.")
 
 export type cartPosition = {
-	["Spline"]:string, -- spline object NAME
+	["Spline"]:string, -- spline object NAME (same as the one in _G.SplineIndex)
 	["Time"]:number, -- t position on the spline object
 	["Direction"]:number, -- in what direction.
 	-- <0: the train is going towards point 1 of the spline.
@@ -23,8 +23,8 @@ export type cartPosition = {
 	The cart object is ONLY representing objects on tracks, and eventually handling moving objects on those.
 ]]
 function cart.new(name:string, startPosition:cartPosition?, model:Model)
+	assert(CartIndex[name] == nil, "Cart name already in use. Change name to avoid collisions.")
 	local self = {}
-
 	self.Name = name
 
 	setmetatable(self, {
@@ -41,20 +41,34 @@ function cart.new(name:string, startPosition:cartPosition?, model:Model)
 	self.ForwardSpace = 0
 	self.BackwardSpace = 0
 
-	table.insert(CartSplineIndex, self)
-
 	if startPosition then
 		self:Move(startPosition)
 	end
 
+	table.insert(CartIndex, self)
 	return self
 end
 
 -- Moves the cart while updating the cart-spline index.
-function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean):nil
+function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean?):nil
+	updateCartSplineIndex = (if not updateCartSplineIndex then false else true)
+	local oldPosition = self.Position
 	self.Position = newPosition
 
-	
+	assert(CartSplineIndex[newPosition.Spline] and CartSplineIndex[oldPosition.Spline], "")
+	if updateCartSplineIndex then
+		-- checks if the new position is another spline.
+		if newPosition.Spline ~= oldPosition.Spline then
+			table.remove(CartSplineIndex[oldPosition.Spline],
+				table.find(CartSplineIndex[oldPosition.Spline], self.Name)
+			)
+			table.insert(CartSplineIndex[newPosition.Spline], 1, self.Name)
+		else -- just check if it's already in the CartSplineIndex
+			if not table.find(CartSplineIndex[newPosition.Spline], self.Name) then
+				table.insert(CartSplineIndex[newPosition.Spline], 1, self.Name)
+			end
+		end
+	end
 
 	return
 end
