@@ -15,7 +15,8 @@ export type cartPosition = {
 	-- <0: the train is going towards point 1 of the spline.
 	-- >0: the train is going towards the last point of the spline.
 	-- this direction is set WHEN THE OBJECT IS SPAWNED, AND SHOULD NOT CHANGE.
-	["CFrame"]:CFrame
+
+	-- ["CFrame"]:CFrame
 }
 
 --[[
@@ -49,7 +50,7 @@ function cart.new(name:string, startPosition:cartPosition?, model:Model)
 	return self
 end
 
--- Moves the cart while updating the cart-spline index.
+-- Moves the cart while (eventually) updating the cart-spline index.
 function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean?):nil
 	updateCartSplineIndex = (if not updateCartSplineIndex then false else true)
 	local oldPosition = self.Position
@@ -73,13 +74,19 @@ function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean?):nil
 	return
 end
 
--- scans the section for other potential carts
-function cart:ScanSection(...:number?):any?
-	local orders = {...}
+--[[
+	Scans the section for other potential carts. filterTag should be part of the cart's name.
+	Distance can be negative, depending on the cart's direction.
+]]
+function cart:ScanSection(distance:number, filterTag:string):any?
+	-- fetch all splines in that direction, and distance.
+	local pos, brok, splines = self:GetRelativePosition(distance)
 
-	for _, direction in pairs(orders) do
-
-	end
+	--[[ there are 3 zones to check:
+		- the starting spline, between the cart and the target goal (if the target goal is on the starting spline!)
+		- the ENTIRETY of the passed splines
+		- the LAST passed spline, between its begining and the target goal
+	]]
 
 	return
 end
@@ -91,11 +98,13 @@ end
 -- CartPosition as usual
 
 -- Boolean, determines if the loop was forcibly broken because the connections did not allow to go that far.
+
+-- used splines in an index (splines it used to reach the goal position, DOESN'T INCLUDE STARTING ONE)
 ]]
 function cart:GetRelativePosition(movingDistance:number):any
 	assert(self.Position~=nil, "Cart doesn't have a position yet.")
 
-	local currentSplineLength = self.Position.Spline.Length
+	local currentSplineLength = SplineIndex[self.Position.Spline].Length
 	local currentSplineTime = self.Position.Time
 	local currentDirection:number = self.Position.Direction
 
@@ -103,9 +112,12 @@ function cart:GetRelativePosition(movingDistance:number):any
 		["Spline"] = nil,
 		["Direction"] = nil,
 		["Time"] = nil,
-		["CFrame"] = nil
+		-- ["CFrame"] = nil
 	}
+
 	local broken = false
+
+	local passedSplines = {}
 
 	--[[
 	2 situations:
@@ -141,10 +153,12 @@ function cart:GetRelativePosition(movingDistance:number):any
 			-- to get the spline from a point, look for its parent name in the SplineIndex.
 			if p then
 				if SplineIndex[p.Parent.Name] then
-					-- it is a control point.
+					table.insert(passedSplines, p.Parent.Name)
+
+					-- it is a control point (part of spline).
 					movingDistance -= newSpline.Length
 					newSpline = SplineIndex[p.Parent.Name]
-					assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Parent.Name.." from "..newSplineName)
+					-- assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Parent.Name.." from "..newSplineName)
 					newSplineName = p.Parent.Name
 
 					-- now set the new direction
@@ -154,6 +168,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 						newDirection = -1 -- we are coming from the forward section, going backward.
 					end
 				elseif SplineIndex[p.Name] then
+					table.insert(passedSplines, p.Name)
+
 					-- it is a node.
 					--movingDistance -= newSpline.Length -- it is 0! not setting it!
 
@@ -167,7 +183,7 @@ function cart:GetRelativePosition(movingDistance:number):any
 					end
 
 					newSpline = SplineIndex[p.Name]
-					assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Name.." from "..newSplineName)
+					-- assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Name.." from "..newSplineName)
 					newSplineName = p.Name
 
 					if newSpline.Connections[1] == oldPoint then -- Connections[1] of a node is always set. Sometimes, Connections[2] isn't.
@@ -182,9 +198,13 @@ function cart:GetRelativePosition(movingDistance:number):any
 					else
 						newDirection = -1 -- we are coming from the forward section, going backward.
 					end
+				else -- JUST in case.
+					broken = true
+					warn("Incorrect control-point/node:", p:GetFullName())
+					break
 				end
 			else
-				-- cannot go forward, loop broken.
+				-- cannot go forward, no connections, loop broken.
 				broken = true
 				break
 			end
@@ -200,10 +220,10 @@ function cart:GetRelativePosition(movingDistance:number):any
 		newPosition.Time = newTime
 		newPosition.Spline = newSplineName
 		newPosition.Direction = newDirection
-		newPosition.CFrame = newSpline:CalculateCFrameAt(newTime)
+		-- newPosition.CFrame = newSpline:CalculateCFrameAt(newTime)
 	end
 
-	return newPosition, broken
+	return newPosition, broken, passedSplines
 end
 
 return cart
