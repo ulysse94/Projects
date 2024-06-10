@@ -35,7 +35,7 @@ function cart.new(name:string, startPosition:cartPosition?, model:Model)
 		end,
 	})
 
-	self._LastReported = nil
+	self._LastUpdatedSplinePos = nil
 
 	self.Model = model
 	self.Position = nil
@@ -52,16 +52,18 @@ end
 
 -- Moves the cart while (eventually) updating the cart-spline index.
 function cart:Move(newPosition:cartPosition, updateCartSplineIndex:boolean?):nil
+	if updateCartSplineIndex == nil then updateCartSplineIndex = true end
 	updateCartSplineIndex = (if not updateCartSplineIndex then false else true)
-	local oldPosition = self.Position
+
+	self._LastUpdatedSplinePos = (if updateCartSplineIndex then self.Position else self._LastUpdatedSplinePos)
 	self.Position = newPosition
 
-	assert(CartSplineIndex[newPosition.Spline] and CartSplineIndex[oldPosition.Spline], "")
+	assert(CartSplineIndex[newPosition.Spline] and CartSplineIndex[self._LastUpdatedSplinePos.Spline], "")
 	if updateCartSplineIndex then
 		-- checks if the new position is another spline.
-		if newPosition.Spline ~= oldPosition.Spline then
-			table.remove(CartSplineIndex[oldPosition.Spline],
-				table.find(CartSplineIndex[oldPosition.Spline], self.Name)
+		if newPosition.Spline ~= self._LastUpdatedSplinePos.Spline then
+			table.remove(CartSplineIndex[self._LastUpdatedSplinePos.Spline],
+				table.find(CartSplineIndex[self._LastUpdatedSplinePos.Spline], self.Name)
 			)
 			table.insert(CartSplineIndex[newPosition.Spline], 1, self.Name)
 		else -- just check if it's already in the CartSplineIndex
@@ -77,18 +79,84 @@ end
 --[[
 	Scans the section for other potential carts. filterTag should be part of the cart's name.
 	Distance can be negative, depending on the cart's direction.
+	Returns the list of cart names.
 ]]
-function cart:ScanSection(distance:number, filterTag:string):any?
+function cart:ScanSection(distance:number, filterTag:string?):{string}
+	local found = {}
 	-- fetch all splines in that direction, and distance.
-	local pos, brok, splines = self:GetRelativePosition(distance)
+	local pos, broken, passed = self:GetRelativePosition(distance)
 
 	--[[ there are 3 zones to check:
-		- the starting spline, between the cart and the target goal (if the target goal is on the starting spline!)
-		- the ENTIRETY of the passed splines
-		- the LAST passed spline, between its begining and the target goal
+		1. the starting spline, between the cart and the target goal (if the target goal is on the starting spline!)
+		2. the ENTIRETY of the passed splines
+		3. the LAST passed spline, between its begining and the target goal
 	]]
+	if broken then
+		warn("Scan section shortened: broken tracks.")
+	end
 
-	return
+	assert(#passed ~= 0, "Did not get any passed splines from GetRelativePosition.")
+
+	-- 1. in the starting spline
+	for _, cartName in pairs(CartSplineIndex[passed[1][1]]) do
+		local fC = CartIndex[cartName]
+
+		local inDistance = false --avoid redundancy
+		if passed[1][2] < 0 then
+			if fC.Position.Time - passed[1][3] >= 0 and fC.Position.Time <= self.Position.Time then
+				inDistance = true
+			end
+		elseif passed[1][2] > 0 then
+			if passed[1][3] - passed[1][3] <= 0 and fC.Position.Time >= self.Position.Time then
+				inDistance = true
+			end
+		end
+
+		if inDistance and filterTag and string.find(cartName, filterTag, 1, true) then
+			table.insert(found, 1, cartName)
+		elseif inDistance and not filterTag then
+			table.insert(found, 1, cartName)
+		end
+	end
+
+	-- 2. check the other splines (fully, no distance check)
+	if #passed > 2 then
+		for i = 2, #passed-1, 1 do
+			for _, cartName in pairs(CartSplineIndex[passed[i][1]]) do
+				if filterTag and string.find(cartName, filterTag, 1, true) then
+					table.insert(found, 1, cartName)
+				elseif not filterTag then
+					table.insert(found, 1, cartName)
+				end
+			end
+		end
+	end
+
+	-- 3. check the last spline
+	if #passed >= 2 then
+		for _, cartName in pairs(CartSplineIndex[passed[#passed][1]]) do
+			local fC = CartIndex[cartName]
+
+			local inDistance = false --avoid redundancy
+			if passed[1][2] < 0 then
+				if fC.Position.Time - passed[1][3] >= 0 then
+					inDistance = true
+				end
+			elseif passed[1][2] > 0 then
+				if passed[1][3] - passed[1][3] <= 0 then
+					inDistance = true
+				end
+			end
+
+			if inDistance and filterTag and string.find(cartName, filterTag, 1, true) then
+				table.insert(found, 1, cartName)
+			elseif inDistance and not filterTag then
+				table.insert(found, 1, cartName)
+			end
+		end
+	end
+
+	return found
 end
 
 --[[ gets the position that is forward/backward, movingDistance being a distance in studs (+/-).
@@ -99,7 +167,7 @@ end
 
 -- Boolean, determines if the loop was forcibly broken because the connections did not allow to go that far.
 
--- used splines in an index (splines it used to reach the goal position, DOESN'T INCLUDE STARTING ONE)
+-- used splines in an index (splines it used to reach the goal position): { {spline name, direction, time passed in (0 if node)} }
 ]]
 function cart:GetRelativePosition(movingDistance:number):any
 	assert(self.Position~=nil, "Cart doesn't have a position yet.")
@@ -135,6 +203,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 		newPosition.Time = newTime
 		newPosition.Spline = self.Position.Spline
 		newPosition.Direction = currentDirection
+
+		table.insert(passedSplines, 1, {self.Position.Spline, currentDirection, newTime})
 	else -- Situation 2.
 		-- On cherche la distance qui "overflow".
 		local newDirection = self.Position.Direction
@@ -144,19 +214,23 @@ function cart:GetRelativePosition(movingDistance:number):any
 			newDirection = -1
 		end
 
+		movingDistance *= math.sign(currentDirection) --we make it positive. the direction is handled by newDirection.
+
 		local newSplineName = self.Position.Spline
 		local newSpline = SplineIndex[newSplineName]
+
+		table.insert(passedSplines, {newSplineName, newDirection, newSpline.Length})
+
 		-- tant qu'on n'est pas au bout, on continue à chercher plus loin.
 		while movingDistance > newSpline.Length do
 			local p = newSpline.Connections[math.sign(if newDirection < 0 then 1 else 2)]
+
 			-- this is not the spline yet, only its control point.
 			-- to get the spline from a point, look for its parent name in the SplineIndex.
 			if p then
 				if SplineIndex[p.Parent.Name] then
-					table.insert(passedSplines, p.Parent.Name)
-
 					-- it is a control point (part of spline).
-					movingDistance -= newSpline.Length
+
 					newSpline = SplineIndex[p.Parent.Name]
 					-- assert(newSpline~=nil, "Incorrect connection: Spline not found: "..p.Parent.Name.." from "..newSplineName)
 					newSplineName = p.Parent.Name
@@ -167,9 +241,11 @@ function cart:GetRelativePosition(movingDistance:number):any
 					else
 						newDirection = -1 -- we are coming from the forward section, going backward.
 					end
-				elseif SplineIndex[p.Name] then
-					table.insert(passedSplines, p.Name)
 
+					table.insert(passedSplines, {newSplineName, newDirection, newSpline.Length})
+
+					movingDistance -= newSpline.Length
+				elseif SplineIndex[p.Name] then
 					-- it is a node.
 					--movingDistance -= newSpline.Length -- it is 0! not setting it!
 
@@ -192,12 +268,7 @@ function cart:GetRelativePosition(movingDistance:number):any
 						newDirection = -1
 					end
 
-					-- now set the new direction
-					if p.Name == "1" then
-						newDirection = 1
-					else
-						newDirection = -1 -- we are coming from the forward section, going backward.
-					end
+					table.insert(passedSplines, {newSplineName, newDirection, 0})
 				else -- JUST in case.
 					broken = true
 					warn("Incorrect control-point/node:", p:GetFullName())
@@ -221,6 +292,8 @@ function cart:GetRelativePosition(movingDistance:number):any
 		newPosition.Spline = newSplineName
 		newPosition.Direction = newDirection
 		-- newPosition.CFrame = newSpline:CalculateCFrameAt(newTime)
+
+		table.insert(passedSplines, {newSplineName, newDirection, movingDistance})
 	end
 
 	return newPosition, broken, passedSplines
