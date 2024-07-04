@@ -9,8 +9,8 @@ local nodeFunctions = require(game.ReplicatedStorage.Utilities.NodeFunctions)
 --[[
 	Creates a new node.
 	Note that **back section must be unique**, while there can be multiple front sections.
-	Do not use for crossovers.
-	backSection and frontSections are spline objects.
+	Do not use for crossovers. Only junctions, eventually disconnected parts (i.e. turntables).
+	backSection and frontSections are spline objects (eventually a node).
 	backSection is unique, while frontSections is a list.
 	`Model` is the BasePart which represents the node.
 ]]
