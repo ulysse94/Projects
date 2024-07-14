@@ -17,10 +17,12 @@ local splineIndex = {}
 local cartIndex = {}
 local cartSplineIndex = {}
 local partIndex = {}
+local signalIndex = {}
 
 _G.SplineIndex = splineIndex
 _G.CartIndex = cartIndex
 _G.CartSplineIndex = cartSplineIndex
+_G.SignalIndex = signalIndex
 
 local step = .01 -- 1/step iteration per curve
 
