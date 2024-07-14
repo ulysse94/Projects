@@ -1,0 +1,15 @@
+{
+  "className": "Part",
+  "properties": {
+    "BottomSurface": "Smooth",
+    "CFrame": [8.999979, 0.049998, 63.699985, 0, 1, 0, 1, 0, 0, 0, 0, -1],
+    "Shape": "Cylinder",
+    "Size": [0.1, 5, 5],
+    "TopSurface": "Smooth",
+    "Attributes": {
+			"ModuleScript": {
+				"String": "SpeedSign"
+			}
+		}
+  }
+}
