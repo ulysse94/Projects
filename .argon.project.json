@@ -16,6 +16,12 @@
 		},
 		"Workspace": {
 			"$path": "src/Workspace"
+		},
+		"SoundService": {
+			"$path": "src/SoundService"
+		},
+		"TextChatService": {
+			"$path": "src/Workspace"
 		}
 	}
 }
