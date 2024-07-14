@@ -23,7 +23,7 @@ export type cartPosition = {
 	Creates a new cart object.
 	The cart object is ONLY representing objects on tracks, and eventually handling moving objects on those.
 ]]
-function cart.new(name:string, startPosition:cartPosition?, model:Model)
+function cart.new(name:string, startPosition:cartPosition?)
 	assert(CartIndex[name] == nil, "Cart name already in use. Change name to avoid collisions.")
 	local self = {}
 	self.Name = name
@@ -36,11 +36,7 @@ function cart.new(name:string, startPosition:cartPosition?, model:Model)
 	})
 
 	self._LastUpdatedSplinePos = nil
-
-	self.Model = model
 	self.Position = nil
-	self.ForwardSpace = 0
-	self.BackwardSpace = 0
 
 	if startPosition then
 		self:Move(startPosition)
