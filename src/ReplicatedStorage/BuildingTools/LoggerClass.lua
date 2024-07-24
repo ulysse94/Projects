@@ -3,19 +3,37 @@
 --[[
 
 Constructors:
-	new (name [string])
+	new (RedoFunction [function], UndoFunction [function])
         The logger is a class used for tracing back actions. A bit like the studio ChangeHistoryService.
 
 Properties:
-	(READ ONLY) _Maid [Maid]
-		maid.
-	
+	RedoFunction [function]
+		The function called when redoing.
+
+	UndoFunction [function]
+		The function called when undoing.
+
+	(READ ONLY) _Dumped [{LoggerWaypoints}]
+		Used for undoing and redoing.
+
+	(READ ONLY) Waypoints [{LoggerWaypoint}]
+		Last actions.
+
 Methods:
+	Record (name [string], user [string|number], action [{any}]) -> nil
+		Record a new action.
+
+	Redo () -> nil
+
+	Undo () -> nil
+
 	Destroy () -> nil
 
 Events:
-	Event ()
+	None
 ]]
+
+export type LoggerWaypoint = {["Name"]:string,["Timestamp"]:number,["User"]:string|number?, ["Action"]:{}}
 
 local Class = {}
 
@@ -25,7 +43,7 @@ Class.__type = "Logger"
 local function createWaypoint(name:string,
 	user:string|number?,
 	timestamp:number,
-	actionData:any):{["Name"]:string,["Timestamp"]:number,["User"]:string|number?, ["Action"]:{}}
+	actionData:any):LoggerWaypoint
 	local n = {}
 	n.Name = name
 	n.Timestamp = timestamp
@@ -60,7 +78,7 @@ end
 function Class:Undo():nil
 	if self.Waypoints[1] then
 		table.insert(self._Dumped, 1, self.Waypoints[1])
-		
+
 
 		if self.OnUndo then
 			self.OnUndo(self.Waypoints[1])
@@ -83,7 +101,7 @@ function Class:Redo():nil
 end
 
 function Class:Clear():nil
-	self._Dumped = self.Waypoints
+	self._Dumped = table.clone(self.Waypoints)
     self.Waypoints = {}
 
 	return

@@ -1,7 +1,6 @@
-local LocalizationService = game:GetService("LocalizationService")
 -- Generic maid module (not from NevermoreEngine, but do the job)
 
--- For UI, this module has additional functions
+-- As this is an UI utility, this module has additional functions
 
 -- CONSTANTS
 
