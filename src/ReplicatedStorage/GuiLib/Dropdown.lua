@@ -90,7 +90,7 @@ local DEFAULT_SETTINGS = {
 	TEXT_SIZE = 14,
 	TEXT_FONT = Enum.Font.Gotham,
 	TEXT_WEIGHT = Enum.FontWeight.Medium,
-	
+
 	LIST_BACKGROUND_COLOR3 = Color3.fromRGB(30, 30, 30),
 	LIST_BACKGROUND_TRANSPARENCY = .4,
 	LIST_BUTTON_TRANSPARENCY = .15,
@@ -99,7 +99,7 @@ local DEFAULT_SETTINGS = {
 	LIST_MINIMUM_X = 40, --Minimum frame size: 80 pixels.
 	LIST_MINIMUM_Y = 14 + 4, --TEXT_SIZE + 4
 	LIST_BORDER_PADDING = 10,
-	
+
 	TWEENINFO = TweenInfo.new(.25,Enum.EasingStyle.Quart,Enum.EasingDirection.In,0,false,0)
 }
 --local ARROW_UP = "rbxassetid://5154078925"
@@ -139,7 +139,7 @@ function Class.new(elements:{string}, target:TextButton):{}
 	self.AddNilOption = false
 	self.CloseOnSelected = true
 	self.Parent = target
-	
+
 	self._Settings = DEFAULT_SETTINGS
 
 	self.Parent.ClipsDescendants = false
@@ -364,7 +364,7 @@ function Class:_Create():nil
 	if not self._OptionTextLabel then
 		self._OptionTextLabel = Instance.new("TextLabel")
 		self._OptionTextLabel.BackgroundTransparency = 1
-		
+
 		self._OptionTextLabel.Position = UDim2.new(0,0,0,0)
 		self._OptionTextLabel.Size = UDim2.fromScale(1,1)
 		self._OptionTextLabel.TextXAlignment = Enum.TextXAlignment.Left

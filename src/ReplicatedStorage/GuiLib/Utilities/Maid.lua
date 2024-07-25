@@ -55,7 +55,7 @@ function MaidClass.FetchSettingsByPrefix(settings:{}, settingPrefix:string):{}
 	return subSettings
 end
 
-function MaidClass.LoadSegment(settings:{}, settingPrefix:string, object:Frame?):{Frame}
+function MaidClass.LoadSegment(settings:{}, settingPrefix:string, object:Frame?):Frame
 	--note: will use "object" to store the list of lines.
 	--can also edit the "object" to make it a line.
 
@@ -226,7 +226,7 @@ function MaidClass.LoadText(settings:{}, settingPrefix:string, object:TextLabel|
 	return
 end
 
-function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:GuiObject)
+function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:GuiObject):nil
 	if not object then return end
 
 	local subSettings = {}
@@ -291,6 +291,8 @@ function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:Gui
 
 		corner.Parent = object
 	end
+
+	return
 end
 
 -- Public Constructors
