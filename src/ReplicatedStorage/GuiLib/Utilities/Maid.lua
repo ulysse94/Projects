@@ -233,17 +233,19 @@ function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:Gui
 	local hasStroke = false
 	local hasGradient = false
 	local hasCorner = false
+	local hasPadding = false
 	settingPrefix = settingPrefix.."_" --custom fetch
 
 	table.foreach(settings, --apparently deprecated, but who cares.
 	function(key, value)
 		local s,e = string.find(key,settingPrefix)
-		if s == 1 and e then
+		if s == 1 and e ~= nil then -- Correctly found pattern.
 			local sub = string.sub(key,1,e)
 			subSettings[sub] = value
 			hasStroke = (string.find(sub, "STROKE", 1, true) ~= nil)
 			hasGradient = (string.find(sub, "GRADIENT", 1, true) ~= nil)
 			hasCorner = (string.find(sub, "CORNER", 1, true) ~= nil)
+			hasPadding = (string.find(sub, "UIPADDING", 1, true) ~= nil)
 		end
 	end)
 
@@ -259,6 +261,11 @@ function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:Gui
 	GRADIENT_ROTATION = 0,
 
 	CORNER = UDim.new(),
+
+	UIPADDING_TOP = UDim.new(),
+	UIPADDING_LEFT = UDim.new(),
+	UIPADDING_RIGHT = UDim.new(),
+	UIPADDING_BOTTOM = UDim.new(),
 	]]
 
 	if hasStroke then
@@ -290,6 +297,16 @@ function MaidClass.LoadComplements(settings:{}, settingPrefix:string, object:Gui
 		corner.CornerRadius = subSettings.CORNER
 
 		corner.Parent = object
+	end
+	if hasPadding then
+		local padding = object:FindFirstAncestorOfClass("UIPadding") or Instance.new("UIPadding")
+
+		padding.PaddingTop = subSettings.UIPADDING_TOP
+		padding.PaddingLeft = subSettings.UIPADDING_LEFT
+		padding.PaddingRight = subSettings.UIPADDING_RIGHT
+		padding.PaddingBottom = subSettings.UIPADDING_BOTTOM
+
+		padding.Parent = object
 	end
 
 	return
