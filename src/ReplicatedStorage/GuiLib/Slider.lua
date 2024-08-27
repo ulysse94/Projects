@@ -18,7 +18,7 @@ Properties:
 
 	(READ ONLY) _Settings [{}]
 
-	(READ ONLY) _Active [boolean]
+	(REMOVED) (READ ONLY) _Active [boolean]
 		Wether or not the slider is being used.
 
 	(READ ONLY) Current [number]
@@ -30,8 +30,8 @@ Properties:
 
 	CanSlide [boolean]
 
-	ProgressBar [boolean]
-		Show progress bar or not (might need to call _Update afterwards)
+	(READ ONLY) ProgressBar [boolean]
+		Show progress bar or not.
 
 	Range [NumberRange]
 		When changed, **it will not change the current value, that may be off-limit**, but you can try Slider:SetValue(Slider.Current)
@@ -49,6 +49,10 @@ Methods:
 		Set the current value.
 
 	SetInputLabel (inputLabel [TextLabel?|TextBox?]) -> nil
+
+	SetProgressBarVisible (toggle [boolean]) -> nil
+
+	_UpdateSocketPosition () -> nil
 
 	Destroy () -> nil
 
@@ -73,7 +77,7 @@ local DEFAULT_SETTINGS = {
 	BAR_BORDER_SIZE = 2, --in px
 	BAR_BORDER_COLOR3 = Color3.fromRGB(117, 65, 65),
 
-	BAR_IMAGE = "rbxassetid://0",
+	BAR_IMAGE = "",
 	BAR_IMAGE_COLOR3 = Color3.new(),
 	BAR_IMAGE_TRANSPARENCY = 0,
 	BAR_IMAGE_SCALE = Enum.ScaleType.Stretch,
@@ -83,7 +87,7 @@ local DEFAULT_SETTINGS = {
 
 	SOCKET_SIZE = UDim2.fromOffset(15,15),
 
-	SOCKET_IMAGE = "rbxassetid://0", --rbxassetid://
+	SOCKET_IMAGE = "", --rbxassetid://
 	SOCKET_IMAGE_COLOR3 = Color3.new(),
 	SOCKET_IMAGE_TRANSPARENCY = 0,
 	SOCKET_IMAGE_SCALE = Enum.ScaleType.Stretch,
@@ -91,7 +95,7 @@ local DEFAULT_SETTINGS = {
 	SOCKET_IMAGE_SLICE_CENTER = Rect.new(),
 	SOCKET_IMAGE_SLICE_SCALE = 0,
 
-	PROGRESS_IMAGE = "rbxassetid://0",
+	PROGRESS_IMAGE = "",
 	PROGRESS_IMAGE_COLOR3 = Color3.new(),
 	PROGRESS_IMAGE_TRANSPARENCY = 0,
 	PROGRESS_IMAGE_SCALE = Enum.ScaleType.Stretch,
@@ -119,7 +123,7 @@ function Class.new(range:NumberRange, target:Frame, inputLabel:(TextBox?)|(TextL
 
 	self._Settings = DEFAULT_SETTINGS
 
-	self._Active = false
+	-- self._Active = false
 
 	self.Range = range
 	self.Current = default or range.Min
@@ -139,46 +143,68 @@ function Class.new(range:NumberRange, target:Frame, inputLabel:(TextBox?)|(TextL
 
 	self:SetInputLabel(inputLabel)
 
-	local function onInput(action:InputObject) --Input ended is detected after, not here.
-		if table.find(self._Settings.INPUT_TYPE, action.UserInputType) and self.CanSlide == true then
-			if action.UserInputState == Enum.UserInputState.Begin then
-				self._Active = true
-			elseif action.UserInputState == Enum.UserInputState.Change then
-				local sliderRot = self._Parent.AbsoluteRotation --absolute rotation range: 0 - 360
-				--using a trigonometry (circle), we can get the vector in which the slider is pointing.
-				local sliderVector = Vector2.new(math.cos(sliderRot), math.sin(sliderRot))
-				local mouseDelta = Vector2.new(action.Delta.X, action.Delta.Y) --Z is for scrolling and gamepad trigger.
-				--now, to know for how much the mouse "slided" the dot, i have to make the projection of mouseDelta on pointDir
-				--formula: proj_sliderVector(mouseDelta) = mouseDetla * Angle(sliderVector,mouseDelta)
-				--with Angle(sliderVector,mouseDelta) = arrcos(sliderVector . mouseDelta / (|sliderVector| * |mouseDelta|))
-				local valueChange = mouseDelta * math.acos(sliderVector:Dot(mouseDelta) / (sliderVector.Magnitude * mouseDelta.Magnitude))
+	-- local function onInput(action:InputObject) --Input ended is detected after, not here.
+	-- 	if table.find(self._Settings.INPUT_TYPE, action.UserInputType) and self.CanSlide == true then
+	-- 		if action.UserInputState == Enum.UserInputState.Begin then
+	-- 			self._Active = true
+	-- 		elseif action.UserInputState == Enum.UserInputState.Change then
+	-- 			local sliderRot = self._Parent.AbsoluteRotation --absolute rotation range: 0 - 360
+	-- 			--using a trigonometry (circle), we can get the vector in which the slider is pointing.
+	-- 			local sliderVector = Vector2.new(math.cos(sliderRot), math.sin(sliderRot))
+	-- 			local mouseDelta = Vector2.new(action.Delta.X, action.Delta.Y) --Z is for scrolling and gamepad trigger.
+	-- 			--now, to know for how much the mouse "slided" the dot, i have to make the projection of mouseDelta on pointDir
+	-- 			--formula: proj_sliderVector(mouseDelta) = mouseDetla * Angle(sliderVector,mouseDelta)
+	-- 			--with Angle(sliderVector,mouseDelta) = arrcos(sliderVector . mouseDelta / (|sliderVector| * |mouseDelta|))
+	-- 			local valueChange = mouseDelta * math.acos(sliderVector:Dot(mouseDelta) / (sliderVector.Magnitude * mouseDelta.Magnitude))
 
-				self:SetValue(self.Current + valueChange)
+	-- 			self:SetValue(self.Current + valueChange)
+	-- 		end
+	-- 	end
+	-- end
+
+	-- self._Maid:Mark(self.Socket.InputBegan:Connect(onInput))
+
+	-- self._Maid:Mark(UIS.InputEnded:Connect(function(action--[[,processed]]) --ignore if it's processed or not. i just want to know if focus is released.
+	-- 	if self._Active == true and table.find(self._Settings.INPUT_TYPE, action.UserInputType) then
+	-- 		self._Active = false
+	-- 		--rounding to increment
+	-- 		self:SetValue(self.Current - self.Current % self.Increment)
+	-- 	end
+	-- end))
+
+	-- self._Maid:Mark(self.Bar.MouseWheelForward:Connect(function()
+	-- 	if self.CanSlide == true then
+	-- 		self:SetValue(self.Current + self.Increment)
+	-- 	end
+	-- end))
+
+	-- self._Maid:Mark(self.Bar.MouseWheelBackward:Connect(function()
+	-- 	if self.CanSlide == true then
+	-- 		self:SetValue(self.Current - self.Increment)
+	-- 	end
+	-- end))
+
+	if self.Socket and self.Socket:FindFirstAncestorOfClass("UIDragDetector") then
+		local drag = self.Socket:FindFirstAncestorOfClass("UIDragDetector")
+
+		drag.DragEnd:Connect(function()
+			local totalUI = self.Bar.AbsoluteSize - self.Socket.AbsoluteSize.X
+			local totalRange = self.Range.Max - self.Range.Min
+
+			local totalDrag = drag.DragUDim2.X.Offset / totalUI
+			totalDrag *= totalRange
+
+			local newCurrent = math.clamp(self.Current + totalDrag, self.Range.Min, self.Range.Max)
+			-- Rounding value to the (lower) increment.
+			if newCurrent % self.Increment ~= 0 then
+				newCurrent -= newCurrent % self.Increment
 			end
-		end
+
+			self.Current = newCurrent
+			self._ChangedEvent:Fire(newCurrent)
+			self:_UpdateSocketPosition()
+		end)
 	end
-
-	self._Maid:Mark(self.Socket.InputBegan:Connect(onInput))
-
-	self._Maid:Mark(UIS.InputEnded:Connect(function(action--[[,processed]]) --ignore if it's processed or not. i just want to know if focus is released.
-		if self._Active == true and table.find(self._Settings.INPUT_TYPE, action.UserInputType) then
-			self._Active = false
-			--rounding to increment
-			self:SetValue(self.Current - self.Current % self.Increment)
-		end
-	end))
-
-	self._Maid:Mark(self.Bar.MouseWheelForward:Connect(function()
-		if self.CanSlide == true then
-			self:SetValue(self.Current + self.Increment)
-		end
-	end))
-
-	self._Maid:Mark(self.Bar.MouseWheelBackward:Connect(function()
-		if self.CanSlide == true then
-			self:SetValue(self.Current - self.Increment)
-		end
-	end))
 
 	self._Parent = target
 
@@ -215,24 +241,41 @@ function Class:_Create():nil
 		image.Name = "ProgressImage"
 		image.BackgroundTransparency = 1
 		image.Size = UDim2.fromScale(0,1)
+		image.AnchorPoint = Vector2.new(0,.5)
+		image.Position = UDim2.fromScale(0,.5)
 		image.Parent = self.Bar
 	end
 
 	if not self.Socket then
 		self.Socket = Instance.new("ImageButton")
 		self.Bar.Name = "SliderSocket"
+		self.AnchorPoint = Vector2.new(0,.5)
 		self._Maid:Mark(self.Socket)
 		self.Socket.Parent = self._Parent
 	end
 
+	if not self.Socket:FindFirstAncestorOfClass("UIDragDetector") then
+		local n = Instance.new("UIDragDetector")
+
+		n.DragStyle = Enum.UIDragDetectorDragStyle.TranslateLine
+		n.DragAxis = Vector2.new(1,0)
+		n.DragRelativity = Enum.UIDragDetectorDragRelativity.Relative
+		n.BoundingUI = self.Bar
+		n.BoundingBehavior = Enum.UIDragDetectorBoundingBehavior.EntireObject
+		n.ResponseStyle = Enum.UIDragDetectorResponseStyle.Offset
+
+		n.Parent = self.Socket
+	end
+
 	self:_Update()
+
+	self:_UpdateSocketPosition()
 
 	return
 end
 
 function Class:_Update():nil
 	self.Bar.Size = UDim2.new(UDim.new(1,0), self._Settings.BAR_SIZE_Y)
-	
 
 	self.Bar.BackgroundColor3 = self._Settings.BAR_BACKGROUND_COLOR3
 	self.Bar.BackgroundTransparency = self._Settings.BAR_BACKGROUND_TRANSPARENCY
@@ -246,21 +289,38 @@ function Class:_Update():nil
 	MaidClass.LoadImage(self._Settings, "BAR", backImage)
 
 	local progressImage = self.Bar:FindFirstChild("ProgressImage")
-
 	MaidClass.LoadImage(self._Settings, "PROGRESS", progressImage)
 
 	self.Socket.Size = self._Settings.SOCKET_SIZE
-
 	MaidClass.LoadImage(self._Settings, "SOCKET", self.Socket)
-	
+
+	return
+end
+
+function Class:_UpdateSocketPosition():nil
+	local progressImage = self.Bar:FindFirstChild("ProgressImage")
 
 	-- local barSize = self.Bar.AbsoluteSize - self.Socket.AbsoluteSize
-	local absoluteRange = self.Range.Max - self.Range.Min
-	local absoluteCurrent = self.Current - self.Range.Min
-	self.Socket.Position = UDim2.new(absoluteCurrent / absoluteRange, 0, .5, 0)
+	-- local absoluteRange = self.Range.Max - self.Range.Min
+	-- local absoluteCurrent = self.Current - self.Range.Min
+	-- self.Socket.Position = UDim2.new(absoluteCurrent / absoluteRange, 0, .5, 0)
 
+	-- progressImage.Size = UDim2.new(absoluteCurrent / absoluteRange, 0, 1, 0)
+
+	local totalUI = self.Bar.AbsoluteSize.Y - self.Socket.AbsoluteSize.Y
+	local totalCurrent = self.Current / (self.Range.Max - self.Range.Min)
+
+	self.Socket.Position = UDim2.new(0,totalCurrent*totalUI,.5,0)
+	progressImage.Size = UDim2.new(0,totalCurrent*totalUI,1,0)
+
+	return
+end
+
+function Class:SetProgressBarVisible(toggle:boolean):nil
+	self.ProgressBar = toggle
+
+	local progressImage = self.Bar:FindFirstChild("ProgressImage")
 	progressImage.Visible = self.ProgressBar
-	self.ProgressBar.Size = UDim2.new(absoluteCurrent / absoluteRange, 0, 1, 0)
 
 	return
 end
@@ -270,8 +330,8 @@ function Class:SetInputLabel(textBox:(TextBox?)|(TextLabel?)):nil
 
 	self.InputLabel = textBox
 ---@diagnostic disable-next-line invalid-type-name
-	if typeof(textBox) == "TextBox" then
-		self._TextMasker = TextMaskerClass.new(TextMaskerClass.numbers, self.InputLabel, "Whitelist")
+	if typeof(textBox) == "TextBox" then --may be nil!
+		self._TextMasker = TextMaskerClass.new(TextMaskerClass.numbers, self.InputLabel, "Whitelist") --TODO: Update TextMasker methods.
 		self._InputLabelMaid:Mark(self._TextMasker)
 
 		self._InputLabelMaid:Mark(self._TextMasker.Unfiltered:Connect(function(new)
@@ -309,7 +369,7 @@ function Class:SetValue(new:number):nil
 
 		self.Current = new
 
-		self:_Update()
+		self:_UpdateSocketPosition()
 	end
 
 	return
