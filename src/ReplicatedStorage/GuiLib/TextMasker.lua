@@ -41,7 +41,7 @@ Methods:
 
 Events:
 	Filtered (original [string])
-		Fires each time a character is filtered. Gives original string.
+		Fires each time a character is filtered. Gives unfiltered string.
 
 	Unfiltered ()
 		Fired when nothing was filtered from the new input.
@@ -68,7 +68,7 @@ function Class.new(list:{string}?, targets:{TextBox}?, listMode:ListMode?, Chara
 	self._Connections = {}
 
 	self.Targets = targets or {}
-	self.ListMode = listMode or "Whitelist"
+	self.ListMode = listMode
 	self.List = list or {}
 	self.CharacterLimit = nil or CharacterLimit
 	self._FilteredEvent = Instance.new("BindableEvent")

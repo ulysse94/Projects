@@ -46,7 +46,7 @@ Methods:
 	_Update () -> nil
 
 	SetValue (new [number]) -> nil
-		Set the current value.
+		Set the current value. Automatically clamps the new value.
 
 	SetInputLabel (inputLabel [TextLabel?|TextBox?]) -> nil
 
@@ -188,20 +188,23 @@ function Class.new(range:NumberRange, target:Frame, inputLabel:(TextBox?)|(TextL
 		local drag = self.Socket:FindFirstAncestorOfClass("UIDragDetector")
 
 		drag.DragEnd:Connect(function()
-			local totalUI = self.Bar.AbsoluteSize - self.Socket.AbsoluteSize.X
-			local totalRange = self.Range.Max - self.Range.Min
+			if self.CanSlide then
+				local totalUI = self.Bar.AbsoluteSize - self.Socket.AbsoluteSize.X
+				local totalRange = self.Range.Max - self.Range.Min
 
-			local totalDrag = drag.DragUDim2.X.Offset / totalUI
-			totalDrag *= totalRange
+				local totalDrag = drag.DragUDim2.X.Offset / totalUI
+				totalDrag *= totalRange
 
-			local newCurrent = math.clamp(self.Current + totalDrag, self.Range.Min, self.Range.Max)
-			-- Rounding value to the (lower) increment.
-			if newCurrent % self.Increment ~= 0 then
-				newCurrent -= newCurrent % self.Increment
+				local newCurrent = self.Current + totalDrag
+				-- Rounding value to the (lower) increment.
+				if newCurrent % self.Increment ~= 0 then
+					newCurrent -= newCurrent % self.Increment
+				end
+
+				self.Current = newCurrent
+				self._ChangedEvent:Fire(newCurrent)
 			end
 
-			self.Current = newCurrent
-			self._ChangedEvent:Fire(newCurrent)
 			self:_UpdateSocketPosition()
 		end)
 	end
@@ -331,7 +334,7 @@ function Class:SetInputLabel(textBox:(TextBox?)|(TextLabel?)):nil
 	self.InputLabel = textBox
 ---@diagnostic disable-next-line invalid-type-name
 	if typeof(textBox) == "TextBox" then --may be nil!
-		self._TextMasker = TextMaskerClass.new(TextMaskerClass.numbers, self.InputLabel, "Whitelist") --TODO: Update TextMasker methods.
+		self._TextMasker = TextMaskerClass.new(TextMaskerClass.numbers, self.InputLabel, "Float", nil)
 		self._InputLabelMaid:Mark(self._TextMasker)
 
 		self._InputLabelMaid:Mark(self._TextMasker.Unfiltered:Connect(function(new)
@@ -339,7 +342,7 @@ function Class:SetInputLabel(textBox:(TextBox?)|(TextLabel?)):nil
 				if new == "" then
 					self:SetValue(self.Range.Min)
 				else
-					self:SetValue(new)
+					self:SetValue(tonumber(new))
 				end
 			else
 				self.InputLabel.Text = self.Current
